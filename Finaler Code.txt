@@ -1,0 +1,461 @@
+// Gesamter Code für die Erstellung der Karte und die automatische Erstellung der Standorte
+// Funktion zum Enqueue des Google Maps Skripts
+function enqueue_google_maps_script() {
+    wp_enqueue_script('google-maps', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDWtJfmMC-XjRbuNRnrH9qRSen4uEj9kyE&callback=initMap', array(), null, true);
+}
+add_action('wp_enqueue_scripts', 'enqueue_google_maps_script');
+// Funktion zum Abrufen von Shelly-Daten aus der Datenbank
+function get_user_shelly_data() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'user_shelly_data';
+    $result = $wpdb->get_row("SELECT shelly_id FROM $table_name ORDER BY shelly_id DESC LIMIT 1", ARRAY_A);
+    return $result;
+}
+
+// Funktion zum Abrufen des neuesten KWh-Datensatzes aus der Datenbank
+function get_latest_kwh_data_from_db() {
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'kwh_daten';
+    $result = $wpdb->get_row("SELECT * FROM $table_name ORDER BY Zeitpunkt DESC LIMIT 1", ARRAY_A);
+    return $result;
+}
+
+function shelly_switch_shortcode() {
+    global $wpdb;
+
+    // Wenn das Benutzer-Formular gesendet wurde, Daten in der Datenbank speichern oder löschen
+    if (isset($_POST['submit_shelly_data'])) {
+        save_user_shelly_data();
+    } elseif (isset($_POST['delete_shelly_data'])) {
+        delete_textfield_data();
+    } elseif (isset($_POST['delete_shelly_id'])) {
+        delete_user_shelly_data();
+    }
+
+    // Shelly-Daten aus der Datenbank abrufen
+    $shelly_data = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}user_shelly_data", ARRAY_A);
+
+    // Überprüfen, ob Shelly-Daten vorhanden sind
+    if ($shelly_data) {
+        // Shelly-Marker generieren
+        $marker_script = generate_marker_script($shelly_data);
+
+        // Shortcode-Ausgabe
+        $output = '<div id="map" style="height: 400px;"></div>';
+        $output .= '<form method="post" action="">
+                        <label for="shelly_id">Shelly ID:</label>
+                        <input type="text" id="shelly_id" name="shelly_id" value="' . esc_attr(isset($_POST['shelly_id']) ? $_POST['shelly_id'] : '') . '" required>
+                        <label for="auth_key">Auth Key:</label>
+                        <input type="text" id="auth_key" name="auth_key" value="' . esc_attr(isset($_POST['auth_key']) ? $_POST['auth_key'] : '') . '" required>
+                        <label for="shelly_number">Shelly Nummer:</label>
+                        <input type="text" id="shelly_number" name="shelly_number" value="' . esc_attr(isset($_POST['shelly_number']) ? $_POST['shelly_number'] : '') . '" required>
+                        <label for="shelly_text">Shelly Text:</label>
+                        <input type="text" id="shelly_text" name="shelly_text" value="">
+                        <input type="submit" name="submit_shelly_data" value="Daten speichern">
+                        <input type="submit" name="delete_shelly_data" value="Daten l&ouml;schen">
+                    </form>';
+        $output .= '<form method="post" action="">
+                        <label for="delete_shelly_id">Shelly ID zum L&ouml;schen:</label>
+                        <input type="text" id="delete_shelly_id" name="delete_shelly_id" required>
+                        <input type="submit" name="delete_shelly_datas" value="Daten l&ouml;schen">
+                    </form>';
+        $output .= '<script>
+                        function initMap() {
+                            const mapOptions = {
+                                zoom: 2,
+                                center: { lat: 19, lng: 9 },
+                            };
+                            const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+                            // Hier Marker hinzufügen...
+                            [' . $marker_script . '].forEach(markerData => {
+                                const marker = new google.maps.Marker(markerData);
+                                const infowindow = new google.maps.InfoWindow({
+                                    content: markerData.content,
+                                });
+                                marker.addListener("click", function () {
+                                    infowindow.open(map, marker);
+                                });
+                            });
+                        }
+                    </script>';
+
+        return $output;
+    } else {
+        // Shelly-Daten nicht vorhanden, zeige Karte und Eingabefelder ohne spezifische Daten an
+        $output = '<div id="map" style="height: 400px;"></div>';
+        $output .= '<form method="post" action="">
+                        <label for="shelly_id">Shelly ID:</label>
+                        <input type="text" id="shelly_id" name="shelly_id" value="' . esc_attr(isset($_POST['shelly_id']) ? $_POST['shelly_id'] : '') . '" required>
+                        <label for="auth_key">Auth Key:</label>
+                        <input type="text" id="auth_key" name="auth_key" value="' . esc_attr(isset($_POST['auth_key']) ? $_POST['auth_key'] : '') . '" required>
+                        <label for="shelly_number">Shelly Nummer:</label>
+                        <input type="text" id="shelly_number" name="shelly_number" value="' . esc_attr(isset($_POST['shelly_number']) ? $_POST['shelly_number'] : '') . '" required>
+                        <label for="shelly_text">Shelly Text:</label>
+                        <input type="text" id="shelly_text" name="shelly_text" value="">
+                        <input type="submit" name="submit_shelly_data" value="Daten speichern">
+                        <input type="submit" name="delete_shelly_data" value="Daten l&ouml;schen">
+                    </form>';
+        $output .= '<script>
+                        function initMap() {
+                            // Standard-LatLng für den Fall, dass keine Shelly-Daten vorhanden sind
+                            const defaultLatLng = { lat: 19, lng: 9 };
+                            const mapOptions = {
+                                zoom: 2,
+                                center: defaultLatLng,
+                            };
+                            const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+                        }
+                    </script>';
+
+        return $output;
+    }
+}
+
+function generate_marker_script($shelly_data) {
+    $marker_script = '';
+
+    foreach ($shelly_data as $shelly) {
+        // Curl-Anfrage für die JSON-Daten
+        $curl_url = 'https://shelly-' . $shelly['shelly_number'] . '-eu.shelly.cloud/device/settings';
+        $curl_data = 'id=' . $shelly['shelly_id'] . '&auth_key=' . $shelly['auth_key'];
+        $json_data = curl_request_with_retry($curl_url, $curl_data);
+
+        // JSON-Daten dekodieren
+        $decoded_data = json_decode($json_data, true);
+
+        // Überprüfen, ob die Dekodierung erfolgreich war und lat und lng Werte vorhanden sind
+        if ($decoded_data && isset($decoded_data['data']['device_settings']['sys']['location']['lat']) && isset($decoded_data['data']['device_settings']['sys']['location']['lon'])) {
+            $lat = $decoded_data['data']['device_settings']['sys']['location']['lat'];
+            $lng = $decoded_data['data']['device_settings']['sys']['location']['lon'];
+            // Stromwert abrufen
+            $current_power = get_second_power_value($shelly['shelly_id'], $shelly['auth_key'], $shelly['shelly_number']);
+
+            // Infofenster-Inhalt^
+            $info_content = '<div><strong>Name:</strong> ' . esc_html($shelly['shelly_text']) . '</div>';
+            $info_content .= '<div><strong>Shelly ID:</strong> ' . esc_html($shelly['shelly_id']) . '</div>';
+            $info_content .= '<div><strong>Stromwert:</strong> ' . esc_html($current_power) . ' Watt</div>';
+
+            // Marker hinzufügen
+            $marker_script .= '{
+                                position: { lat: ' . $lat . ', lng: ' . $lng . ' },
+                                map: map,
+                                title: "Shellynator ' . $shelly['shelly_id'] . '",
+                                content: \'' . addslashes($info_content) .'\'
+                            },';
+        }
+    }
+
+    return $marker_script;
+}
+add_shortcode('shelly_switch_map', 'shelly_switch_shortcode');
+function curl_request_with_retry($url, $data, $max_attempts = 3) {
+    $attempts = 0;
+
+    do {
+        $attempts++;
+
+        // Curl-Anfrage durchführen
+        $curl_response = curl_init();
+        curl_setopt($curl_response, CURLOPT_URL, $url);
+        curl_setopt($curl_response, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl_response, CURLOPT_POST, 1);
+        curl_setopt($curl_response, CURLOPT_POSTFIELDS, $data);
+        $json_data = curl_exec($curl_response);
+        curl_close($curl_response);
+
+        // JSON-Daten dekodieren
+        $decoded_data = json_decode($json_data, true);
+
+        // Überprüfen, ob die Dekodierung erfolgreich war und die erwarteten Daten vorhanden sind
+        $success_condition = ($decoded_data && isset($decoded_data['data']['device_settings']['sys']['location']['lat']) && isset($decoded_data['data']['device_settings']['sys']['location']['lon']));
+
+        if ($success_condition || $attempts >= $max_attempts) {
+            break;  // Erfolg oder maximale Versuche erreicht
+        }
+
+        // Warten, bevor der nächste Versuch durchgeführt wird (optional)
+        sleep(1);
+
+    } while (true);
+
+    return $json_data;
+}
+
+function get_second_power_value($shelly_id, $auth_key, $shelly_number) {
+    // Curl-Anfrage für die JSON-Daten
+    $curl_url = 'https://shelly-' . $shelly_number . '-eu.shelly.cloud/device/status';
+    $curl_data = 'id=' . $shelly_id . '&auth_key=' . $auth_key;
+
+    // Curl ausführen
+    $curl_response = curl_init();
+    curl_setopt($curl_response, CURLOPT_URL, $curl_url);
+    curl_setopt($curl_response, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl_response, CURLOPT_POST, 1);
+    curl_setopt($curl_response, CURLOPT_POSTFIELDS, $curl_data);
+
+    // Daten abrufen
+    $json_data = curl_exec($curl_response);
+
+    curl_close($curl_response);
+
+    // JSON-Daten dekodieren
+    $decoded_data = json_decode($json_data, true);
+
+    // Überprüfen, ob die Dekodierung erfolgreich war und der zweite "power"-Wert vorhanden ist
+    if ($decoded_data && isset($decoded_data['data']['online']) && $decoded_data['data']['online'] == true && isset($decoded_data['data']['device_status']['switch:0']['apower'])) {
+        $second_power_value = $decoded_data['data']['device_status']['switch:0']['apower'];
+        return $second_power_value;
+    } else {
+        // Das Gerät ist offline oder der Wert fehlt, setze den Powerwert auf 0
+        return 0;
+    }
+}
+
+function save_user_shelly_data() {
+    global $wpdb;
+
+    // Überprüfen, ob alle Formularfelder gesetzt sind
+    if (isset($_POST['shelly_id'], $_POST['auth_key'], $_POST['shelly_number'], $_POST['shelly_text']) &&
+        !empty($_POST['shelly_id']) && !empty($_POST['auth_key']) && !empty($_POST['shelly_number'])) {
+
+        $shelly_id = sanitize_text_field($_POST['shelly_id']);
+        $auth_key = sanitize_text_field($_POST['auth_key']);
+        $shelly_number = sanitize_text_field($_POST['shelly_number']);
+        $shelly_text = sanitize_text_field($_POST['shelly_text']);
+
+        // Überprüfen, ob die Länge des auth_key nicht mehr als 92 Zeichen beträgt
+        if (strlen($auth_key) <= 92) {
+
+            // Curl-Anfrage für die Überprüfung der Shelly-Daten
+            $curl_url = 'https://shelly-' . $shelly_number . '-eu.shelly.cloud/device/status';
+            $curl_data = 'id=' . $shelly_id . '&auth_key=' . $auth_key;
+
+            // Curl ausführen
+            $curl_response = curl_init();
+            curl_setopt($curl_response, CURLOPT_URL, $curl_url);
+            curl_setopt($curl_response, CURLOPT_RETURNTRANSFER, 1);
+            curl_setopt($curl_response, CURLOPT_POST, 1);
+            curl_setopt($curl_response, CURLOPT_POSTFIELDS, $curl_data);
+            $json_data = curl_exec($curl_response);
+            curl_close($curl_response);
+
+            // JSON-Daten dekodieren
+            $decoded_data = json_decode($json_data, true);
+
+            // Überprüfen, ob die Dekodierung erfolgreich war und der Curl ein Ergebnis gebracht hat
+            if ($decoded_data && isset($decoded_data['data']['device_status']['switch:0']['apower'])) {
+
+                $table_name = $wpdb->prefix . 'user_shelly_data';
+
+                $insert_result = $wpdb->insert(
+                    $table_name,
+                    array(
+                        'shelly_id' => $shelly_id,
+                        'auth_key' => $auth_key,
+                        'shelly_number' => $shelly_number,
+                        'shelly_text' => $shelly_text, // Hinzugefügtes Feld
+                    ),
+                    array('%s', '%s', '%s', '%s')
+                );
+
+                // Überprüfen, ob der Insert erfolgreich war
+                if ($insert_result === false) {
+                    // Es gab einen Fehler beim Einfügen, zeige Fehlermeldung an
+                    return 'Fehler beim Speichern der Daten in die Datenbank. SQL-Fehler: ' . $wpdb->last_error;
+                }
+
+                // Erfolgreich gespeichert, keine Fehlermeldung zurückgeben
+                return '';
+
+            } else {
+                // Curl war nicht erfolgreich, zeige Fehlermeldung an
+                return 'Die eingegebenen Shelly-Daten sind ungültig.';
+            }
+
+        } else {
+            // auth_key ist zu lang, zeige Fehlermeldung an
+            return 'Der Auth Key darf nicht mehr als 92 Zeichen enthalten.';
+        }
+
+    } else {
+        // Mindestens eines der Formularfelder ist leer, zeige Fehlermeldung an
+        return 'Alle Felder im Formular müssen ausgefüllt sein.';
+    }
+}
+
+
+function delete_user_shelly_data() {
+    global $wpdb;
+
+    // Überprüfen, ob die Shelly ID gesetzt ist
+    if (isset($_POST['delete_shelly_id'])) {
+        $shelly_id_to_delete = sanitize_text_field($_POST['delete_shelly_id']);
+
+        // Direkten SQL-Befehl ausführen
+        $sql = $wpdb->prepare("DELETE FROM {$wpdb->prefix}user_shelly_data WHERE shelly_id = %s", $shelly_id_to_delete);
+        $wpdb->query($sql);
+    }
+}
+
+// Funktion zum Löschen der Textfeld-Daten
+function delete_textfield_data() {
+    // Überprüfen, ob die Textfelder gesetzt sind
+    if (isset($_POST['shelly_id'], $_POST['auth_key'], $_POST['shelly_number'])) {
+        // Setze die Werte der Textfelder auf leer
+        $_POST['shelly_id'] = '';
+        $_POST['auth_key'] = '';
+        $_POST['shelly_number'] = '';
+    }
+}
+// Gesamter Code für die Anzeige und Befüllung der Tabelle mit den aktuellen Daten von Shelly
+function get_kwh_data() {
+    $api_url = 'https://cozysmartwarmth.de/wp-json/wp/v2/kwh';
+    
+    // API-Anfrage durchführen
+    $response = wp_remote_get($api_url);
+
+    // Überprüfen, ob die API-Anfrage erfolgreich war
+    if (is_wp_error($response)) {
+        return false;
+    }
+
+    // API-Antwort in JSON dekodieren
+    $body = wp_remote_retrieve_body($response);
+    $data = json_decode($body, true);
+
+    return $data;
+}
+// Füge eine benutzerdefinierte API-Route hinzu
+add_action('rest_api_init', function () {
+    register_rest_route('custom/v1', '/save_kwh_data/', array(
+        'methods' => 'GET',
+        'callback' => 'save_kwh_data_api_endpoint',
+    ));
+});
+
+// Callback-Funktion für die benutzerdefinierte API-Route
+function save_kwh_data_api_endpoint() {
+    // Rufe die Funktion zum Speichern der Daten auf
+    $result_message = save_kwh_data_to_db();
+
+    // Gibt das Ergebnis als JSON zurück
+    return rest_ensure_response(array('message' => $result_message));
+}
+// Funktion zum Speichern der Daten in der Datenbank
+function save_kwh_data_to_db() {
+    global $wpdb;
+
+    // API-Daten abrufen
+    $kwh_data = get_kwh_data();
+
+    // Überprüfen, ob die Daten erfolgreich abgerufen wurden
+    if ($kwh_data) {
+        // Tabellenname
+        $table_name = $wpdb->prefix . 'kwh_daten';
+
+        // Daten in die Tabelle einfügen
+        $result = $wpdb->insert(
+            $table_name,
+            array(
+                'aktuell' => $kwh_data['aktuell'],
+                'kwh_akt_tag' => $kwh_data['kwh_akt_tag'],
+                'kwh_vor_tag' => $kwh_data['kwh_vor_tag'],
+                'kwh_akt_woche' => $kwh_data['kwh_akt_woche'],
+                'kwh_vor_woche' => $kwh_data['kwh_vor_woche'],
+                'kwh_akt_monat' => $kwh_data['kwh_akt_monat'],
+                'kwh_vor_monat' => $kwh_data['kwh_vor_monat'],
+                'kwh_akt_jahr' => $kwh_data['kwh_akt_jahr'],
+                'kwh_vor_jahr' => $kwh_data['kwh_vor_jahr'],
+            )
+        );
+
+        // Erfolgsnachricht ausgeben
+        if ($result !== false) {
+            return 'Daten erfolgreich gespeichert.';
+        } else {
+            return 'Fehler beim Speichern der Daten.';
+        }
+    } else {
+        // Fehlerbehandlung, falls die API-Anfrage fehlschlägt
+        return 'Fehler beim Abrufen der Daten.';
+    }
+}
+
+// Funktion zum Abrufen der gespeicherten Daten aus der Datenbank
+function get_kwh_data_from_db() {
+    global $wpdb;
+
+    // Tabellenname
+    $table_name = $wpdb->prefix . 'kwh_daten';
+
+    // Spaltennamen auflisten, die abgerufen werden sollen
+    $columns = array(
+        'aktuell',
+        'kwh_akt_tag',
+        'kwh_vor_tag',
+        'kwh_akt_woche',
+        'kwh_vor_woche',
+        'kwh_akt_monat',
+        'kwh_vor_monat',
+        'kwh_akt_jahr',
+        'kwh_vor_jahr',
+        // Weitere Spalten hier hinzufügen
+    );
+
+    // Spaltennamen in einen String umwandeln
+    $columns_string = implode(', ', $columns);
+
+    // Abfrage zum Abrufen der ausgewählten Spalten
+    $results = $wpdb->get_results("SELECT $columns_string FROM $table_name ORDER BY Zeitpunkt DESC LIMIT 1", ARRAY_A);
+
+    return $results;
+}
+
+
+
+// Shortcode-Funktion für das Anzeigen der Daten in einer Tabelle
+function display_kwh_data_shortcode() {
+    // Daten aus der Datenbank abrufen
+    $kwh_data = get_kwh_data_from_db();
+
+    // Überprüfen, ob Daten vorhanden sind
+    if ($kwh_data) {
+        // Tabelle starten
+        $table_html = '<table border="1">
+            <thead>
+                <tr>
+                    <th>Aktuell</th>
+                    <th>KWH Aktueller Tag</th>
+                    <th>KWH Vorheriger Tag</th>
+                    <th>KWH Aktuelle Woche</th>
+                    <th>KWH Vorherige Woche</th>
+                    <th>KWH Aktueller Monat</th>
+                    <th>KWH Vorheriger Monat</th>
+                    <th>KWH Aktuelles Jahr</th>
+                    <th>KWH Vorheriges Jahr</th>
+                </tr>
+            </thead>
+            <tbody>';
+
+        // Daten in die Tabelle einfügen
+        foreach ($kwh_data as $row) {
+            $table_html .= '<tr>';
+            foreach ($row as $value) {
+                $table_html .= '<td>' . esc_html($value) . '</td>';
+            }
+            $table_html .= '</tr>';
+        }
+
+        // Tabelle beenden
+        $table_html .= '</tbody></table>';
+
+        return $table_html;
+    } else {
+        // Nachricht anzeigen, wenn keine Daten vorhanden sind
+        return 'Keine Daten vorhanden.';
+    }
+}
+
+// Shortcode registrieren
+add_shortcode('display_kwh_data', 'display_kwh_data_shortcode');

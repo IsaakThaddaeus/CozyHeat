@@ -1,7 +1,7 @@
 // Gesamter Code für die Erstellung der Karte und die automatische Erstellung der Standorte
 // Funktion zum Enqueue des Google Maps Skripts
 function enqueue_google_maps_script() {
-    wp_enqueue_script('google-maps', 'https://maps.googleapis.com/maps/api/js?key=AIzaSyDWtJfmMC-XjRbuNRnrH9qRSen4uEj9kyE&callback=initMap', array(), null, true);
+    wp_enqueue_script('google-maps', 'https://maps.googleapis.com/maps/api/js?key=[Ihr API KEY]&callback=initMap', array(), null, true);
 }
 add_action('wp_enqueue_scripts', 'enqueue_google_maps_script');
 // Funktion zum Abrufen von Shelly-Daten aus der Datenbank

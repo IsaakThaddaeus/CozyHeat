@@ -1,8 +1,65 @@
 <?php
 
-/**
- * Definition aller APIs
- */
+
+//---Start Phase 1-----------------------------------------
+
+add_action('rest_api_init', 'create_custon_endpoint_3');
+
+function create_custon_endpoint_3() {
+    register_rest_route('wp/v2', '/setConfig', array(
+        'methods' => 'GET',
+        'callback' => 'get_response_3',
+    ));
+}
+
+function get_response_3($data) {
+    $input_string = $data['config'];
+
+    global $wpdb;
+
+    $table_name = $wpdb->prefix . 'config'; // Ersetze 'deine_tabelle' durch den tatsächlichen Tabellennamen
+
+    $wpdb->query("TRUNCATE TABLE $table_name");
+    
+    $wpdb->insert(
+        $table_name,
+        array('config' => $input_string),
+        array('%s')
+    );
+    
+    return rest_ensure_response($input_string);
+}
+
+
+add_action( 'rest_api_init', 'create_custon_endpoint_4' );
+ 
+function create_custon_endpoint_4(){
+    register_rest_route('wp/v2', '/getConfig', array(
+        'methods' => 'GET',
+        'callback' => 'get_response_4',
+    ));
+}
+
+function get_response_4() {
+	global $wpdb;
+	
+    $table_name = $wpdb->prefix . 'config'; 
+
+    $result = $wpdb->get_row("SELECT * FROM $table_name LIMIT 1");
+
+    if ($result) {
+        $config_value = $result->config;
+        return $config_value;
+    }
+}
+
+//---Ende Phase 1-----------------------------------------
+
+
+
+
+
+//---Start Phase 2-----------------------------------------
 
 add_action( 'rest_api_init', 'create_custon_endpoint' );
  
@@ -272,56 +329,43 @@ function get_kwh_vor_jahr(){
     return $results;
 }
 
+//---Endde Phase 2-----------------------------------------
 
 
-add_action('rest_api_init', 'create_custon_endpoint_3');
-
-function create_custon_endpoint_3() {
-    register_rest_route('wp/v2', '/setConfig', array(
-        'methods' => 'GET',
-        'callback' => 'get_response_3',
-    ));
-}
-
-function get_response_3($data) {
-    $input_string = $data['config'];
-
-    global $wpdb;
-
-    $table_name = $wpdb->prefix . 'config'; // Ersetze 'deine_tabelle' durch den tatsächlichen Tabellennamen
-
-    $wpdb->query("TRUNCATE TABLE $table_name");
-    
-    $wpdb->insert(
-        $table_name,
-        array('config' => $input_string),
-        array('%s')
-    );
-    
-    return rest_ensure_response($input_string);
-}
 
 
-add_action( 'rest_api_init', 'create_custon_endpoint_4' );
- 
-function create_custon_endpoint_4(){
-    register_rest_route('wp/v2', '/getConfig', array(
-        'methods' => 'GET',
-        'callback' => 'get_response_4',
-    ));
-}
 
-function get_response_4() {
-	global $wpdb;
-	
-    $table_name = $wpdb->prefix . 'config'; 
 
-    $result = $wpdb->get_row("SELECT * FROM $table_name LIMIT 1");
 
-    if ($result) {
-        $config_value = $result->config;
-        return $config_value;
-    }
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

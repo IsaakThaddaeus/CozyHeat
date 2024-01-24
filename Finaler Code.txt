@@ -425,7 +425,7 @@ function display_kwh_data_shortcode() {
         $table_html = '<table border="1">
             <thead>
                 <tr>
-                    <th>Aktuell</th>
+                    <th>Watt Aktuell</th>
                     <th>KWH Aktueller Tag</th>
                     <th>KWH Vorheriger Tag</th>
                     <th>KWH Aktuelle Woche</th>

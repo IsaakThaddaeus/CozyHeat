@@ -178,7 +178,7 @@ function rechne_kwh($data){
 		}
 	}
 
-	//$sum = $sum / 60;
+	$sum = $sum / 1000;
 
 	return $sum;
 }

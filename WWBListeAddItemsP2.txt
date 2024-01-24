@@ -1,0 +1,140 @@
+
+//Es wird geprueft ob die zwei Zeitwerte = NULL sind
+if(Modus3Zeit1.state == NULL || Modus3Zeit2.state == NULL){
+  logInfo("Test: ", "einer der beiden ist NULL")
+  ZeitFehlermeldung.postUpdate(" Wählen Sie für beide Zeiten einen Wert aus und bestätigten Sie den Wert ")
+  return
+}
+
+
+  // Die Werte der Uhrzeiten werden ermittelt
+  var String Zeit1 = Modus3Zeit1.state.format("%1$tH:%1$tM") 
+  var String Zeit2 = Modus3Zeit2.state.format("%1$tH:%1$tM")
+  logInfo("Test: ", Zeit2)
+  
+  // Es wird überprüft ob die erste Zeit nach der zweiten Zeit liegt
+  if (Integer::parseInt(Zeit1.replaceAll("[^0-9]", "")) >= Integer::parseInt(Zeit2.replaceAll("[^0-9]", ""))) {
+    
+    ZeitFehlermeldung.postUpdate(" Die Startzeit darf sich nicht nach der Endzeit befinden. Bitte ändern Sie die Zeiten ")
+    return
+  
+  }
+
+  // Der Wert der Stromkategorie wird ermittelt
+  var kategorie = KategorieStrom.state
+  logInfo("Test: ", kategorie.toString())
+    
+  // Der Wert des Tagmodus wird ermittel, entweder Werktag oder Wochende 
+  val TagMode = TagModus.state
+  logInfo("Test: ", TagMode.toString())
+
+/*  var String Tag = "Tag"
+  if(TagMode.toString() == "ON"){
+      Tag = "Werktag"
+    }
+  else {Tag = "Wochenende"}
+  logInfo("Test: ", Tag)
+
+*/
+  //Die Daten werden zu einem String zusammengefasst
+  val String DatenZusammengefuegt = Zeit1 + " - " + Zeit2 + " | " + kategorie
+  logInfo("Test: ", DatenZusammengefuegt)
+
+  //Es wird die Anzahl der bereits existierenden Items ermittelt je nachdem ob es in Werktag oder Wochenende ist
+  var membersize = 0
+  
+  if(TagMode.toString() == "ON") {
+    
+    membersize = ListeStromString.members.size
+  
+  }
+  else {
+  
+    membersize = ListeStromStringWochenende.members.size
+  
+  }
+   
+  logInfo("Test: ", membersize.toString())
+    
+  ZeitFehlermeldung.postUpdate(" ")
+
+  // Es wird ein neues Item erstellt
+  Zeit1 = Zeit1.replace(":", "")
+  Zeit2 = Zeit2.replace(":", "")
+  logInfo("Test: ", Zeit1 + Zeit2)
+  
+    
+  // Mit dieser Schleife werden die bereits erstellten Zeiten durchgelaufen um zu prüfen ob sich der ausgewählte Zeitraum in einem bereits erstellten Zeitraum befindet
+  
+  var zaehler = 1
+  var String pruefer
+  
+    
+  while (zaehler <= membersize) {
+    
+    
+    if(TagMode.toString() == "ON"){
+      
+      pruefer = ListeStromString.members.get(zaehler - 1).state.toString().replaceAll("[^0-9]", "")
+      
+    }
+  else {
+  
+      pruefer = ListeStromStringWochenende.members.get(zaehler - 1).state.toString().replaceAll("[^0-9]", "")
+  
+  }
+  
+    
+    
+    logInfo("Test: ", "Pruefung: " + pruefer)
+    
+    var int start = Integer::parseInt(pruefer.substring(0, 4))
+    var int ende = Integer::parseInt(pruefer.substring(4, 8))
+      
+    var int zeit1int = Integer::parseInt(Zeit1.replaceAll("[^0-9]", ""))
+    var int zeit2int = Integer::parseInt(Zeit2.replaceAll("[^0-9]", ""))
+    
+    logInfo("Test: ", "Zeit1 und Zeit2 Int: " + zeit1int + " -- " + zeit2int)
+    logInfo("Test: ", "getrennte Zahlen int: " + start + " -- " + ende)
+
+    if ((zeit1int >= start && zeit1int <= ende) || (zeit2int <= ende && zeit2int >= start)) {
+
+      logInfo("Test: ", "Es hat funktioniert!!")
+      ZeitFehlermeldung.postUpdate("Die ausgewählten Zeiten befinden sich in einem Zeitraum für den bereits eine Kategorie festgelegt wurde. Bitte ändern Sie die Zeiten")
+      return
+    }
+    else {ZeitFehlermeldung.postUpdate(" ")}
+    
+    zaehler = zaehler + 1
+    
+  }
+  
+  var String Tag  
+
+  if(TagMode.toString() == "ON") {Tag = "WT"}
+  else {Tag = "WE"}
+  
+  // Es wird ein neues Item erstellt in das Model aufgenommen
+  var listItem = new StringItem("ListenItem" + Zeit1 +  "_" + Zeit2 + Tag)
+  logInfo("Test: ", listItem.state.toString())
+  org.openhab.core.model.script.ScriptServiceUtil.getItemRegistry.add(listItem)  
+  
+  // Das Item wird der Group hinzugefügt und bekommt seinen Wert
+  
+  automatischAktualisieren.postUpdate("ListenItem" + Zeit1 +  "_" + Zeit2 + Tag)  
+    
+  if(TagMode.toString() == "ON") {
+  
+    ListeStromString.addMember(listItem)
+    ListeStromString.members.get(membersize).postUpdate(DatenZusammengefuegt)
+  
+  }
+  else {
+    
+    ListeStromStringWochenende.addMember(listItem)
+    ListeStromStringWochenende.members.get(membersize).postUpdate(DatenZusammengefuegt)
+    
+    
+    
+  }
+

@@ -1,0 +1,39 @@
+
+logInfo("Infrarotheizung", "Infrarotheizung wurde Initiallisiert")
+if(Heizen.state == NULL){
+   Heizen.postUpdate("ON")
+
+   logInfo("Infrarotheizung", "Heizen wurde Initiallisiert")
+}
+
+
+while((produzierterStrom.state as Number).floatValue >= (WattGrenzeFuerAktivierung.state as Number).floatValue && ((Temperatur.state as Number).floatValue < (untergrenzeT.state as Number).floatValue || (Luftfeuchtigkeit.state as Number).floatValue > (obergrenzeL.state as Number).floatValue) && Heizen.state == "ON" && SwitchEinfachErweitert.state == ON && InfrarotheizungItem.state ==ON){
+  if((Temperatur.state as Number).floatValue > (obergrenzeT.state as Number).floatValue && (Luftfeuchtigkeit.state as Number).floatValue < (untergrenzeL.state as Number).floatValue){
+         Heizen.postUpdate("OFF")
+              logInfo("Infrarotheizung", "HEIZEN WIRD ABGEBROCHEN")
+
+  }
+    
+  if( UberhitzungsBoolean.state == OFF){
+        TimerBefehl.postUpdate("BETRIEB")
+
+  }
+  
+  if( UberhitzungsBoolean.state == ON){
+          TimerBefehl.postUpdate("SCHUTZ")
+
+
+
+ 
+}
+
+  if(SwitchEinfachErweitert.state == ON&&((produzierterStrom.state as Number).floatValue < (WattGrenzeFuerAktivierung.state as Number).floatValue || ((Temperatur.state as Number).floatValue > (obergrenzeT.state as Number).floatValue && (Luftfeuchtigkeit.state as Number).floatValue < (untergrenzeL.state as Number).floatValue) || Heizen.state == "OFF" || InfrarotheizungItem.state == OFF )){
+            Shelly1PMb.postUpdate("SIGNAL-DEAKTIVIERT")
+            TimerBefehl.postUpdate("SCHUTZ")
+
+       if(((Temperatur.state as Number).floatValue < (untergrenzeT.state as Number).floatValue || (Luftfeuchtigkeit.state as Number).floatValue > (obergrenzeL.state as Number).floatValue) ){
+              Heizen.postUpdate("ON")
+       }
+  }
+
+ 

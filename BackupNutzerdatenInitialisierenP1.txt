@@ -1,0 +1,14 @@
+//API call an Wordpress Server um die Nutzerdaten für das Backup abzufragen.
+//Die Variable nutzerdaten ist mit der Endung "getConfig", der URL zu befüllen (https://DOMAINNAME/wp-json/wp/v2/getConfig)
+var  nutzerdaten = sendHttpGetRequest("https://cozysmartwarmth.de/wp-json/wp/v2/getConfig")
+
+//------Ab hier nichts veraendern------  
+//Call wird mit delimiter aufgeschluesselt und zugewiesen
+val lines = nutzerdaten.split(';')
+  //P1
+  InfrarotheizungItem.postUpdate(lines.get(0).substring(1))
+  IntervallUeberpruefung.postUpdate(lines.get(1))
+  WattGrenzeFuerAktivierung.postUpdate(lines.get(2))
+  LZaktivierung.postUpdate(lines.get(3))
+  PauseDeaktivierung.postUpdate(lines.get(4))
+  UberhitzungsBoolean.postUpdate(OFF)

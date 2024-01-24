@@ -1,0 +1,14 @@
+//Das Thermometer wurde fuer das Projekt bereits bereitgestellt wenn sich Daten aender sind dise hier anzupassen.
+var content ="deviceids=035DD29D94C5&phoneid=285142992122" //"deviceids=DEVICEID&phoneid=PHONEID"
+var url ="https://www.data199.com/api/pv1/device/lastmeasurement" // sollte sich nicht veraendern
+//--- Ab hier nichts veraendern----
+var antwortVonThermometer = sendHttpPostRequest(url,"application/x-www-form-urlencoded",content, 3000) 
+var String thermometerResponse = antwortVonThermometer
+var temperatur = transform("JSONPATH", "$.devices[0].measurement.t1", thermometerResponse)
+var feuchtigkeit = transform("JSONPATH", "$.devices[0].measurement.h", thermometerResponse)
+logInfo("DatenErfassung", "antwortVonThermometer, Temperatur: " + temperatur+ " Feutchtigkeit: "+feuchtigkeit + "Allgemiene Daten: "+thermometerResponse)
+ Temperatur.postUpdate(temperatur)
+Luftfeuchtigkeit.postUpdate(feuchtigkeit)
+
+
+

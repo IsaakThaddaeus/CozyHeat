@@ -1,0 +1,18 @@
+//API call an Wordpress Server um die Gesamtdatensaetze für die Visualisierung abzufragen.
+///Die Variable 'historie' ist mit der Endung 'kwh' der URL zu füllen(https://DOMAINNAME/wp-json/wp/v2/kwh).
+val historie = sendHttpGetRequest("https://cozysmartwarmth.de/wp-json/wp/v2/kwh")
+///Die Variable 'balkenDaten' ist mit der Endung 'balken' der URL zu füllen(https://DOMAINNAME/wp-json/wp/v2/balken).
+var balkenDaten = sendHttpGetRequest("https://cozysmartwarmth.de/wp-json/wp/v2/balken")
+
+//------Ab hier nichts veraendern------  
+
+//Json des Calls Historie wird gemapped
+TagHeute.postUpdate(Double.parseDouble(transform("JSONPATH", "$.kwh_akt_tag", historie)))
+TagGestern.postUpdate(Double.parseDouble(transform("JSONPATH", "$.kwh_vor_tag", historie)))
+MonatAktuell.postUpdate(Double.parseDouble(transform("JSONPATH", "$.kwh_akt_monat", historie)))
+MonatLetzter.postUpdate(Double.parseDouble(transform("JSONPATH", "$.kwh_vor_monat", historie)))
+JahrAkutell.postUpdate(Double.parseDouble(transform("JSONPATH", "$.kwh_akt_jahr", historie)))
+JahrLetztes.postUpdate(Double.parseDouble(transform("JSONPATH", "$.kwh_vor_jahr", historie)))
+WocheAktuell.postUpdate(Double.parseDouble(transform("JSONPATH", "$.kwh_akt_woche", historie)))
+WocheLetztes.postUpdate(Double.parseDouble(transform("JSONPATH", "$.kwh_vor_woche", historie)))
+

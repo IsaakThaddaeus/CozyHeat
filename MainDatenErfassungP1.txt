@@ -1,0 +1,77 @@
+//Dieses Skript erfasst den Status des Shellys, schaltet die Shelly Kanaele und startet den Stromerzeugungsintervalltimer.
+//Diese Variblen, insbesondere der AuthToken sollte geheim gehalten werden.
+val String urlShellyStatus ="https://shelly-88-eu.shelly.cloud/device/status" // "https://shelly-CLOUDSERVERZIFFER-eu.shelly.cloud/device/status"
+val String urlShellyControl ="https://shelly-88-eu.shelly.cloud/device/relay/control" // "https://shelly-CLOUDSERVERZIFFER-eu.shelly.cloud/relay/control"
+val String authToken="id=68DF03&auth_key=MWY2MGVhdWlkD679DF28D89AC19E01DD8DFB61EFCF89D9805DACB05E0797E646B49CF6D97847522E49A0DFE2BA9F" //"id=SHELLYID&auth_key=KEYVONCLOUDACCOUNT"
+  
+//Die Variable nutzerbackupURL ist mit der Endung "setConfig/?config=", der URL zu befüllen (https://DOMAINNAME/wp-json/wp/v2/setConfig/?config=)
+val String nutzerbackupURL ="https://cozysmartwarmth.de/wp-json/wp/v2/setConfig/?config="
+
+//------Ab hier nichts veraendern------  
+
+  
+  
+val String type ="application/x-www-form-urlencoded"
+//Stromerzeugungsintervalltimer wird initialisiert
+var int stromerzeugungsintervallDauer = (IntervallUeberpruefung.state as Number).intValue
+if(StromerzeugungsintervalltimerVorhanden.state != "DEAKTIVIERT" && StromerzeugungsintervalltimerVorhanden.state != "OPEN-Transmition" && StromerzeugungsintervalltimerVorhanden.state != "AKTIVIERT"){
+  StromerzeugungsintervalltimerVorhanden.postUpdate("DEAKTIVIERT")
+  logInfo("DatenErfassung", "TimerSkript initiiert")
+
+}
+
+//Erzeugten Strom Setzten
+if(StromerzeugungsintervalltimerVorhanden.state == "OPEN-Transmition"){
+var String shellyResponseStrom = null
+var String shellyStatus = null
+//Schleife sorgt dafür das API definitiv erreicht wird
+while (shellyResponseStrom == null){
+   var antwortvonCloudfuerStatus = sendHttpPostRequest(urlShellyStatus,type,authToken, 3000)
+   shellyResponseStrom = antwortvonCloudfuerStatus
+     logInfo("DatenErfassung", antwortvonCloudfuerStatus)
+
+}
+  if (shellyResponseStrom != null){
+    var powerStatus = transform("JSONPATH", "$.data.device_status.meters[1].power", shellyResponseStrom)
+        logInfo("DatenErfassung", powerStatus)
+  produzierterStrom.postUpdate(powerStatus)
+  StromerzeugungsintervalltimerVorhanden.postUpdate("DEAKTIVIERT")
+  } 
+  while (shellyStatus == null){
+
+   var shellyStatusResponse=  sendHttpPostRequest(urlShellyControl,type,"channel=1&turn=on&"+authToken, 3000) 
+   shellyStatus=shellyStatusResponse
+     logInfo("DatenErfassung", "SIcherstellung das Shelly aktiv")
+   }
+}
+
+
+//Shelly Kanal Aktivieren / Deaktivieren
+var String shellyResponseDeaktiviert = null
+var String shellyResponseAktiviert = null
+  
+if(Shelly25PMKanal0.state != "WARTEN"){
+
+if(Shelly25PMKanal0.state == "AKTIVIERT"){
+
+while (shellyResponseAktiviert == null){
+   var antwortvonCloudfuerAktiviert = sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=on&"+authToken, 3000) 
+   shellyResponseAktiviert = antwortvonCloudfuerAktiviert
+        logInfo("DatenErfassung", "Shelly Aktiviert")
+
+}
+}
+if(Shelly25PMKanal0.state == "DEAKTIVIERT"){
+while (shellyResponseDeaktiviert == null){
+   var antwortvonCloudfuerDeaktiviert = sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=off&"+authToken, 3000) 
+   shellyResponseDeaktiviert = antwortvonCloudfuerDeaktiviert
+       logInfo("DatenErfassung", "Shelly Deaktiviert")
+
+}
+}
+  Shelly25PMKanal0.postUpdate("WARTEN")
+
+}
+
+val String datenPhase1 = InfrarotheizungItem.state +";"+ IntervallUeberpruefung.state +";"+WattGrenzeFuerAktivierung.state+";"+LZaktivierung.state+";"+PauseDeaktivierung.state+";"
+val output = sendHttpGetRequest(nutzerbackupURL+datenPhase1+"") 

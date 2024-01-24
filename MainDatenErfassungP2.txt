@@ -1,0 +1,231 @@
+/*Dies ist die Main Rule, von hier aus werden alle RestAPI calls (ausser Temperatur) geschalten und gesteuert.
+Die Kommunikation mit anderen Rules laueft ueber Signale ab, welche von der Main Rule verarbeitet werden.*/
+
+//Zur Nutzung der Shellys, bitte in folgende Variablen die Daten aus der ShellyCloud eintragen.
+
+val String shellyServerURL = "https://shelly-88-eu.shelly.cloud" //SERVER DER SHELLYCLOUD  "https://shelly-CLOUDSERVERZIFFER-eu.shelly.cloud"
+val String authToken="&auth_key=MWY2MGVhdWlkD679DF28D89AC19E01DD8DFB61EFCF89D9805DACB05E0797E646B49CF6D97847522E49A0DFE2BA9F" // AUTHTOKEN DER CLOUD "&auth_key=KEYEINGEBEN"
+val String shellyIDa = "id=4855199b0fc4" // SHELLY ZUM STROM MESSEN "id=IDDESSHELLYS"
+val String shellyIDb ="id=4855199b08b0"  // SHELLY ZUM SCHALTEN DER INFRAROTHEIZUNG "id=IDDESSHELLYS"
+val String shellyIDc ="id=4855199afa94"  // SHELLY ZUM SCHALTEN DES BOILERS "id=IDDESSHELLYS"
+  
+//Die Variable nutzerbackupURL ist mit der Endung "setConfig/?config=", der URL zu befüllen (https://DOMAINNAME/wp-json/wp/v2/setConfig/?config=)
+val String nutzerbackupURL ="https://cozysmartwarmth.de/wp-json/wp/v2/setConfig/?config="
+ 
+// Ab hier nichts veraendern
+  
+  
+  
+val String urlShellyStatus = shellyServerURL + "/device/status"
+val String urlShellyControl =shellyServerURL + "/device/relay/control" 
+val String type ="application/x-www-form-urlencoded"
+//Stromerzeugungsintervall wird initialisiert
+if(StromerzeugungsintervalltimerVorhanden.state == NULL){
+  StromerzeugungsintervalltimerVorhanden.postUpdate("DEAKTIVIERT")
+  logInfo("DatenErfassung", "TimerSkript initiiert")
+}
+
+//Shelly Status Abfrage und wiederherstellung
+//Erzeugten Strom abfragen
+if(StromerzeugungsintervalltimerVorhanden.state == "OPEN-Transmition"){
+  
+var String shellyResponseStrom = null
+var String shellyResponseInfrarot = null
+var String shellyResponseBoiler = null
+//Schleife sorgt dafür das API definitiv erreicht wird
+while (shellyResponseStrom == null){
+   var antwortvonCloudfuerStatus = sendHttpPostRequest(urlShellyStatus,type,shellyIDa+authToken, 3000)
+   shellyResponseStrom = antwortvonCloudfuerStatus
+     logInfo("DatenErfassung", antwortvonCloudfuerStatus)
+}
+  if (shellyResponseStrom != null){
+          var shellyOnline = transform("JSONPATH", "$.data.online", shellyResponseStrom)
+            var powerStatus = "0"
+    if(shellyOnline=="true"){
+     var powerStatusTransform = transform("JSONPATH", "$.data.device_status.switch:0.apower", shellyResponseStrom)
+      powerStatus = powerStatusTransform
+      }
+      logInfo("DatenErfassung", powerStatus+ " "+shellyOnline)
+
+      produzierterStrom.postUpdate(powerStatus)
+      StromerzeugungsintervalltimerVorhanden.postUpdate("DEAKTIVIERT")
+
+  } 
+  
+  
+  //Stellt sicher das die Shellys den richtigen Status besitzen
+     var String kanalStatusShellyA = null
+     var String kanalStatusShellyB = null
+     var String kanalStatusShellyC = null
+
+  if (shellyResponseStrom != null){
+     var shellyResponseMesserStatus = transform("JSONPATH", "$.data.device_status.switch:0.output", shellyResponseStrom)
+        logInfo("Output", "Status Messer:"+shellyResponseMesserStatus)
+      kanalStatusShellyA = shellyResponseMesserStatus.toString
+  } 
+  
+//Schleife sorgt dafür das API definitiv erreicht wird
+while (shellyResponseInfrarot == null){
+   var antwortvonCloudfuerInfrarot = sendHttpPostRequest(urlShellyStatus,type,shellyIDb+authToken, 3000)
+   shellyResponseInfrarot = antwortvonCloudfuerInfrarot
+}
+  if (shellyResponseInfrarot != null){
+     var shellyResponseInfrarotStatus = transform("JSONPATH", "$.data.device_status.switch:0.output", shellyResponseInfrarot)
+       logInfo("Output", "Status Infrarot:"+shellyResponseInfrarotStatus)
+        kanalStatusShellyB = shellyResponseInfrarotStatus.toString
+  }
+ 
+  
+  while (shellyResponseBoiler == null){
+   var antwortvonCloudfuerBoiler = sendHttpPostRequest(urlShellyStatus,type,shellyIDc+authToken, 3000)
+   shellyResponseBoiler = antwortvonCloudfuerBoiler
+}
+  if (shellyResponseBoiler != null){
+     var shellyResponseBoilerStatus = transform("JSONPATH", "$.data.device_status.switch:0.output", shellyResponseBoiler)
+              logInfo("Output", "Status Boiler:"+shellyResponseBoilerStatus)
+        kanalStatusShellyC = shellyResponseBoilerStatus.toString
+  } 
+  
+  if(kanalStatusShellyA == "false"){
+     var String kanalStatusShellyAResponse = null
+    while (kanalStatusShellyAResponse == null){
+    var responseA =sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=on&"+shellyIDa+authToken, 3000) 
+      kanalStatusShellyAResponse= responseA
+  }
+  } 
+  
+
+  if(kanalStatusShellyB == "false" && Shelly1PMb.state == "AKTIVIERT" ){
+     var String kanalStatusShellyBResponse = null
+    while (kanalStatusShellyBResponse == null){
+    var responseB =sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=on&"+shellyIDb+authToken, 3000) 
+      kanalStatusShellyBResponse= responseB
+      }
+}
+  if(kanalStatusShellyB == "true" && Shelly1PMb.state == "DEAKTIVIERT" ){
+     var String kanalStatusShellyBResponseB = null
+    while (kanalStatusShellyBResponseB == null){
+    var responseBB =sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=off&"+shellyIDb+authToken, 3000) 
+      kanalStatusShellyBResponseB= responseBB
+      }
+}
+  
+    if(kanalStatusShellyC == "false" && Shelly1PMc.state == "AKTIVIERT" ){
+     var String kanalStatusShellyCResponse = null
+    while (kanalStatusShellyCResponse == null){
+    var responseC =sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=on&"+shellyIDc+authToken, 3000) 
+      kanalStatusShellyCResponse= responseC
+      }
+}
+  if(kanalStatusShellyC == "true" && Shelly1PMc.state == "DEAKTIVIERT" ){
+     var String kanalStatusShellyCResponseB = null
+    while (kanalStatusShellyCResponseB == null){
+    var responseCB =sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=off&"+shellyIDc+authToken, 3000) 
+      kanalStatusShellyCResponseB= responseCB
+      }
+}
+}
+
+
+
+
+
+//Shelly fuer Infrarotheizung Aktivieren / Deaktivieren
+var String shellyResponseDeaktiviertB = null
+var String shellyResponseAktiviertB = null
+
+if(Shelly1PMb.state != "AKTIVIERT" ||Shelly1PMb.state != "DEAKTIVIERT" ){
+
+if(Shelly1PMb.state == "SIGNAL-AKTIVIERT"){
+
+while (shellyResponseAktiviertB == null){
+   var antwortvonCloudfuerAktiviertB = sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=on&"+shellyIDb+authToken, 3000) 
+   shellyResponseAktiviertB = antwortvonCloudfuerAktiviertB
+        logInfo("DatenErfassung", "Shelly B Aktiviert")
+      Shelly1PMb.postUpdate("AKTIVIERT")
+}
+}
+if(Shelly1PMb.state == "SIGNAL-DEAKTIVIERT"){
+while (shellyResponseDeaktiviertB == null){
+   var antwortvonCloudfuerDeaktiviertB = sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=off&"+shellyIDb+authToken, 3000) 
+   shellyResponseDeaktiviertB = antwortvonCloudfuerDeaktiviertB
+       logInfo("DatenErfassung", "Shelly B Deaktiviert")
+      Shelly1PMb.postUpdate("DEAKTIVIERT")
+
+}
+}
+}
+//Shelly fuer Boiler Aktivieren / Deaktivieren
+var String shellyResponseDeaktiviertC = null
+var String shellyResponseAktiviertC = null
+
+if(Shelly1PMc.state != "AKTIVIERT" ||Shelly1PMc.state != "DEAKTIVIERT" ){
+
+if(Shelly1PMc.state == "SIGNAL-AKTIVIERT"){
+
+while (shellyResponseAktiviertC == null){
+   var antwortvonCloudfuerAktiviertC = sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=on&"+shellyIDc+authToken, 3000) 
+   shellyResponseAktiviertC = antwortvonCloudfuerAktiviertC
+        logInfo("DatenErfassung", "Shelly C Aktiviert")
+      Shelly1PMc.postUpdate("AKTIVIERT")
+}
+}
+if(Shelly1PMc.state == "SIGNAL-DEAKTIVIERT"){
+while (shellyResponseDeaktiviertC == null){
+   var antwortvonCloudfuerDeaktiviertC = sendHttpPostRequest(urlShellyControl,type,"channel=0&turn=off&"+shellyIDc+authToken, 3000) 
+   shellyResponseDeaktiviertC = antwortvonCloudfuerDeaktiviertC
+       logInfo("DatenErfassung", "Shelly C Deaktiviert")
+      Shelly1PMc.postUpdate("DEAKTIVIERT")
+
+}
+}
+}
+
+
+//Shelly Nutzerdatenhochladen fuer Datensicherheit
+val String datenPhase1 = InfrarotheizungItem.state +";"+ IntervallUeberpruefung.state +";"+WattGrenzeFuerAktivierung.state+";"+LZaktivierung.state+";"+PauseDeaktivierung.state+";"
+val String datenPhase2 = AktiverModus.state+";"+Luftfeuchtigkeit.state+";"+Temperatur.state+";"+obergrenzeL.state+";"+obergrenzeT.state+";"+untergrenzeL.state+";"+untergrenzeT.state+";"
+  +WarmwasserboilerItem.state+";"+Modus2Datum1.state+";"+Modus2Datum2.state+";"+Modus4Aktivierungsgrenze.state+";"+SwitchEinfachErweitert.state+";"
+
+  //Wochentage
+  var size = ListeStromString.members.size
+  var i = 0
+  var String datenPhase2ListenItemsWT = ""
+  while(i< size){
+        var gesamtString= ListeStromString.members.get(i).toString
+        val line = gesamtString.split(',')
+        val lines= line.get(1).split(' ')
+        var zeit1 =lines.get(1).split('=').get(1)
+        var zeit2 =lines.get(3)
+        var kategorie = lines.get(7)
+        var ergebnis = "="+zeit1+";"+zeit2+";"+kategorie +";"+"T"
+           // logInfo("WerkTage", ergebnis)
+          datenPhase2ListenItemsWT = datenPhase2ListenItemsWT + ergebnis
+        i++    
+  }
+  //WochenEnde
+  var sizeWE = ListeStromStringWochenende.members.size
+  var j = 0
+  var String datenPhase2ListenItemsWE = ""
+  while(j< sizeWE){
+        var gesamtString= ListeStromStringWochenende.members.get(j).toString
+        val line = gesamtString.split(',')
+        val lines= line.get(1).split(' ')
+        var zeit1 =lines.get(1).split('=').get(1)
+        var zeit2 =lines.get(3)
+        var kategorie = lines.get(7)
+        var ergebnis = "!"+zeit1+";"+zeit2+";"+kategorie +";"+"E"
+           // logInfo("WochenEnde", ergebnis)
+          datenPhase2ListenItemsWE = datenPhase2ListenItemsWE + ergebnis
+       j++    
+  }
+  logInfo("SpeicherDaten", datenPhase1+datenPhase2+datenPhase2ListenItemsWT+datenPhase2ListenItemsWE)
+val output = sendHttpGetRequest(nutzerbackupURL+datenPhase1+datenPhase2+datenPhase2ListenItemsWT+datenPhase2ListenItemsWE+"") 
+
+
+    
+    
+
+
+
+

@@ -1,0 +1,204 @@
+
+//Stellt den aktiven Modus des Boilers fest
+val String modus = AktiverModus.state.toString()
+logInfo("Test: ", "Modus"+modus)
+//Ueberprueft Datum
+var aktuellesDatum = now
+var aktuellerTag = aktuellesDatum.toLocalDate
+logInfo("Test: ", "Datum"+aktuellesDatum.toString())
+
+//Ueberprueft ob es sich um einen Werktag oder Wochenende handelt
+var int weekday = aktuellesDatum.getDayOfWeek.getValue.intValue
+logInfo("Test: ", "Wochentag"+weekday.toString())
+
+var String pruefer
+var int membersize = 0
+var int kategorie
+
+if(weekday < 6) {membersize = ListeStromString.members.size}
+else {membersize = ListeStromStringWochenende.members.size}
+
+var int zaehler = 1
+var Boolean AnAus = false
+  
+// Wenn Modus 1 aktiviert ist------------------------------------------------------------------------------------------------------------------
+if(modus == "Modus-1"){
+  
+  if(WarmwasserboilerItem.state == ON){
+    Shelly1PMc.postUpdate("SIGNAL-AKTIVIERT")
+    WarmwasserboilerItem.postUpdate(ON)
+    logInfo("Test: ", "Shelly wurde aktiviert Modus 1")
+    
+  }
+  else{
+    Shelly1PMc.postUpdate("SIGNAL-DEAKTIVIERT")
+    WarmwasserboilerItem.postUpdate(OFF)
+    logInfo("Test: ", "Shelly wurde deaktiviert Modus 1")  
+       
+  }
+  
+}
+
+
+
+
+
+
+
+// Wenn Modus 2 aktiviert ist------------------------------------------------------------------------------------------------------------------
+else if(modus == "Modus-2"){
+  
+  var datum1State = Modus2Datum1.state
+  var datum2State = Modus2Datum2.state
+  
+  if(datum1State == NULL || datum2State == NULL){return}
+  //Formatiert das Datumsformat 
+  var datum1 = Integer::parseInt(datum1State.format("%1$tY%1$tm%1$td"))
+  var datum2 = Integer::parseInt(datum2State.format("%1$tY%1$tm%1$td"))
+
+  var aktuellerTagInt = Integer::parseInt(aktuellerTag.toString().replace("-", ""))
+  logInfo("Test: ", "aktueller Tag " + aktuellerTagInt.toString())
+  
+  
+  logInfo("Test: ", datum2.toString()) 
+
+  if(aktuellerTagInt >= datum1 && aktuellerTagInt < datum2){
+    Shelly1PMc.postUpdate("SIGNAL-AKTIVIERT")
+    WarmwasserboilerItem.postUpdate(ON)
+    logInfo("Test: ", "Shelly wurde aktiviert Modus 2")
+  }
+  else{
+    Shelly1PMc.postUpdate("SIGNAL-DEAKTIVIERT")
+    WarmwasserboilerItem.postUpdate(OFF)
+    logInfo("Test: ", "Shelly wurde deaktiviert Modus 2")
+       
+  }
+  logInfo("Test: ", "Modus-2 hat funktioniert")
+ 
+}
+
+
+  
+  
+// Wenn Modus 3 aktiviert ist------------------------------------------------------------------------------------------------------------------
+else if(modus == "Modus-3"){
+  
+
+    //nimmt Uhrzeit statt gesamt Datum
+  var int aktuelleUhrzeit =  Integer::parseInt(aktuellesDatum.toString().substring(11, 17).replace(":", ""))
+  
+  var int kategorieK = 0
+  var int kategorieListe = 0
+          
+  if(GuenstigAktiviert.state == ON){kategorieK = 1}
+  if(MittelAktiviert.state == ON){kategorieK = 2}
+  if(TeuerAktiviert.state == ON){kategorieK = 3}
+  
+  
+  if(weekday < 6) {membersize = ListeStromString.members.size}
+  else {membersize = ListeStromStringWochenende.members.size}
+  //Iteriert ueber alle eintetragenen Werte
+  while(zaehler <= membersize){
+  
+        if (weekday < 6){
+
+          pruefer = ListeStromString.members.get(zaehler - 1).state.toString().replaceAll("[^0-9]", "").substring(0, 9)
+        }
+        else{
+
+          pruefer = ListeStromStringWochenende.members.get(zaehler - 1).state.toString().replaceAll("[^0-9]", "").substring(0, 9)
+
+        }
+
+        var int zeit1 = Integer::parseInt(pruefer.substring(0, 4))
+        var int zeit2 = Integer::parseInt(pruefer.substring(4, 8))
+        kategorieListe = Integer::parseInt(pruefer.substring(8, 9))
+
+        if(aktuelleUhrzeit >= zeit1 && aktuelleUhrzeit <= zeit2){
+          AnAus = true
+          zaehler = membersize + 1
+        }
+        else{AnAus = false}
+   
+        zaehler++
+          
+    }
+    logInfo("Test: ",AnAus+ " "+ kategorieListe+ " "+ kategorieK)
+    if(AnAus == true && kategorieListe <= kategorieK){
+      Shelly1PMc.postUpdate("SIGNAL-AKTIVIERT")
+      WarmwasserboilerItem.postUpdate(ON)
+      logInfo("Test: ", "Shelly wurde aktiviert Modus 3")
+    }
+  else{
+    Shelly1PMc.postUpdate("SIGNAL-DEAKTIVIERT")
+    WarmwasserboilerItem.postUpdate(OFF)
+    logInfo("Test: ", "Shelly wurde deaktiviert Modus 3")
+       
+  }
+}
+
+  
+
+
+
+
+// Wenn Modus 4 aktiviert ist------------------------------------------------------------------------------------------------------------------
+else if(modus == "Modus-4"){
+  
+  var float wattGrenzeIH = (WattGrenzeFuerAktivierung.state as Number).floatValue
+  var float aktuellProduzierterStrom = (produzierterStrom.state as Number).floatValue
+  var float WWBWattgrenze = (Modus4Aktivierungsgrenze.state as Number).floatValue
+  var int aktuelleUhrzeit =  Integer::parseInt(aktuellesDatum.toString().substring(11, 17).replace(":", ""))
+
+  //Ueberprueft ob Items mit der kategorie Guenstg vorliegen
+  while(zaehler <= membersize){
+     if (weekday < 6){
+
+          pruefer = ListeStromString.members.get(zaehler - 1).state.toString().replaceAll("[^0-9]", "").substring(0, 9)
+        }
+        else{
+
+          pruefer = ListeStromStringWochenende.members.get(zaehler - 1).state.toString().replaceAll("[^0-9]", "").substring(0, 9)
+
+        }
+        var int zeit1 = Integer::parseInt(pruefer.substring(0, 4))
+        var int zeit2 = Integer::parseInt(pruefer.substring(4, 8))
+        var kostenmodus = Integer::parseInt(pruefer.substring(8, 9))
+
+        if(aktuelleUhrzeit >= zeit1 && aktuelleUhrzeit <= zeit2){
+          
+          zaehler = membersize + 1
+             if(kostenmodus == 1){
+            logInfo("Test: ", "Guenstiger Bereich liegt in Modus 4 zur Uhrzeit vor")
+              AnAus = true
+
+            }
+        }
+        else{AnAus = false}
+  
+    zaehler++
+  }
+  
+       if(((InfrarotheizungItem.state == ON && UberhitzungsBoolean.state == ON) || (InfrarotheizungItem.state == ON && (aktuellProduzierterStrom - wattGrenzeIH) >= WWBWattgrenze)) || (InfrarotheizungItem.state == OFF && (aktuellProduzierterStrom  >= WWBWattgrenze))){
+          AnAus = true
+        }
+  if(AnAus != true){
+    AnAus = false
+  }
+  
+
+        
+        
+  if(AnAus == true){
+    Shelly1PMc.postUpdate("SIGNAL-AKTIVIERT")
+    WarmwasserboilerItem.postUpdate(ON)
+    logInfo("Test: ", "Shelly wurde aktiviert Modus 4")
+       
+  }
+  else{
+    Shelly1PMc.postUpdate("SIGNAL-DEAKTIVIERT")
+    WarmwasserboilerItem.postUpdate(OFF)
+    logInfo("Test: ", "Shelly wurde deaktiviert Modus 4")
+  }
+
+}

@@ -1,0 +1,20 @@
+
+val membersize = ListeStromString.members.size
+logInfo("Test: ", membersize.toString())
+  
+var zaehler = 1
+var String item1
+
+while (zaehler <= membersize) {
+  
+  item1 = ListeStromString.members.get(0).toString()  
+  item1 = item1.substring(0, item1.indexOf(" "))
+  logInfo("Test: ", "Item:: " + item1)
+  
+  org.openhab.core.model.script.ScriptServiceUtil.getItemRegistry.remove(item1)
+  logInfo("Test: ", "Item " + item1 + " wurde entfernt" )
+  
+  zaehler = zaehler + 1
+}
+
+automatischAktualisieren.postUpdate("1")

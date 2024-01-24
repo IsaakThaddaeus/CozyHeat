@@ -1,0 +1,19 @@
+//Schleife kann nicht mit variablen befuellt werden, da immer der aktuelle Stand bei jeder Iteration abgfragt werden muss.
+while((produzierterStrom.state as Number).floatValue >= (WattGrenzeFuerAktivierung.state as Number).floatValue  && SwitchEinfachErweitert.state == OFF && InfrarotheizungItem.state == ON){
+  
+  //Heizung wird angeschalten
+  if( UberhitzungsBoolean.state == OFF){
+
+    TimerBefehl.postUpdate("BETRIEB")
+  }
+    //Heizung wird abgeschalten wegen ueberhitzungsschutz
+  if( UberhitzungsBoolean.state == ON){
+      TimerBefehl.postUpdate("SCHUTZ")
+  
+  }
+}
+  if(SwitchEinfachErweitert.state == OFF &&((produzierterStrom.state as Number).floatValue < (WattGrenzeFuerAktivierung.state as Number).floatValue || InfrarotheizungItem.state == OFF) ){
+      Shelly1PMb.postUpdate("SIGNAL-DEAKTIVIERT")
+
+  }
+

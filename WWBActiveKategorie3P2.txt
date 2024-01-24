@@ -1,0 +1,11 @@
+//stellt fest welche Preisgrenze momentan geschalten ist. Wenn  Mittel ausgewaehlt wurde muss auch guenstig aktiviert werden.
+if(TeuerAktiviert.state == ON){
+  
+  MittelAktiviert.state = ON
+  GuenstigAktiviert.state = ON
+  
+}
+else if(MittelAktiviert.state == ON && TeuerAktiviert.state == OFF){
+  
+  GuenstigAktiviert.state = ON
+}

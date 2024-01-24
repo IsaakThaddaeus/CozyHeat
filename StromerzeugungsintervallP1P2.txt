@@ -1,0 +1,10 @@
+
+  //Timer fuer das aktualisierens des produzierten Stroms
+var Timer stromerzeugungsintervalltimer = null
+  StromerzeugungsintervalltimerVorhanden.postUpdate("AKTIVIERT")
+  logInfo("WattMesser", "Stromerzeugungsintervalltimer wurde gestartet und Triggerd in: "+(IntervallUeberpruefung.state as Number).intValue+" Minuten")
+  stromerzeugungsintervalltimer = createTimer(now.plusMinutes((IntervallUeberpruefung.state as Number).intValue), [ |
+    StromerzeugungsintervalltimerVorhanden.postUpdate("OPEN-Transmition")                                                                                                               
+                                                                 ])
+                                                                 
+  

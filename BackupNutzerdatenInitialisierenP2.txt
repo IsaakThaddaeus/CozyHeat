@@ -1,0 +1,104 @@
+//API call an Wordpress Server um die Nutzerdaten für das Backup abzufragen.
+//Die Variable 'nutzerdaten' ist mit der Endung 'getConfig' der URL zu füllen(https://DOMAINNAME/wp-json/wp/v2/getConfig.
+var  nutzerdaten = sendHttpGetRequest("https://cozysmartwarmth.de/wp-json/wp/v2/getConfig")
+  
+//------Ab hier nichts veraendern------  
+  
+//Delimiter fuer den Call und zuweisung der Datensaetze
+val lines = nutzerdaten.split(';')
+  //P1
+  InfrarotheizungItem.postUpdate(lines.get(0).substring(1))
+  IntervallUeberpruefung.postUpdate(lines.get(1))
+  WattGrenzeFuerAktivierung.postUpdate(lines.get(2))
+  LZaktivierung.postUpdate(lines.get(3))
+  PauseDeaktivierung.postUpdate(lines.get(4))
+  
+  //P2
+  AktiverModus.postUpdate(lines.get(5))
+  Luftfeuchtigkeit.postUpdate(lines.get(6))
+  Temperatur.postUpdate(lines.get(7))
+  obergrenzeL.postUpdate(lines.get(8))
+  obergrenzeT.postUpdate(lines.get(9))
+  untergrenzeL.postUpdate(lines.get(10))
+  untergrenzeT.postUpdate(lines.get(11))
+  WarmwasserboilerItem.postUpdate(lines.get(12))
+  Modus2Datum1.postUpdate(lines.get(13))
+  Modus2Datum2.postUpdate(lines.get(14))
+  Modus4Aktivierungsgrenze.postUpdate(lines.get(15))
+  SwitchEinfachErweitert.postUpdate(lines.get(16))
+  
+  
+ //Die für den Boiler Modus3 benötigten Elemente sind komplexer und leiden unter einem Bug seitens OpenHAB. 
+ //Nach einem Neustart des Raspberry Pi verlieren Items scheinbar 'willkürlich' ihre Gruppenzugehörigkeit. 
+ //Aus diesem Grund werden die ungruppierten Items durch neue ersetzt."
+  
+  //Zuweisung Werktage Modus3 Boiler
+  var i =1
+  var liste = nutzerdaten.split('=')
+  while(liste.size > i){
+    var  elementWT  = liste.get(i)
+    var  teilElementWT = elementWT.split(';')
+    var String zeit1 = teilElementWT.get(0)
+    var String zeit2 = teilElementWT.get(1)
+    var String kategorie = teilElementWT.get(2)
+    var String kategorieText = null
+    switch (kategorie) {
+   case "guenstig":
+        kategorieText = "Kategorie 1"
+   case "mittel":
+       kategorieText = "Kategorie 2"
+   case "teuer":
+       kategorieText = "Kategorie 3"
+}   
+    var String zeit1H =  zeit1.split(':').get(0)
+    var String zeit1M =  zeit1.split(':').get(1)
+    var String zeit2H =  zeit2.split(':').get(0)
+    var String zeit2M =  zeit2.split(':').get(1)
+    var String deleteString = "ListenItem"+zeit1H+zeit1M+"_"+zeit2H+zeit2M+"WT"
+    var String DatenZusammengefuegt = zeit1 + " - " + zeit2 + " | " +kategorieText+" "+kategorie   
+    org.openhab.core.model.script.ScriptServiceUtil.getItemRegistry.remove(deleteString)
+    var listItem = new StringItem(deleteString) 
+    org.openhab.core.model.script.ScriptServiceUtil.getItemRegistry.add(listItem)  
+    ListeStromString.addMember(listItem)
+    ListeStromString.members.get(ListeStromString.members.size-1).postUpdate(DatenZusammengefuegt)
+    i++
+  }
+
+  //Zuweisung Wochenende Modus3 Boiler
+  //Duplicate Code, da der Delimiter ';' zu '!' in derselben Schleife nach mehreren Versuchen nicht einfach umzusetzen schien.
+  var j =1
+  var listeWE = nutzerdaten.split('!')
+  while(listeWE.size > j){
+    var  elementWE  = listeWE.get(j)
+    var  teilElementWE = elementWE.split(';')
+    var String zeit1 = teilElementWE.get(0)
+    var String zeit2 = teilElementWE.get(1)
+    var String kategorie = teilElementWE.get(2)
+    var String kategorieText = null
+    switch (kategorie) {
+   case "guenstig":
+        kategorieText = "Kategorie 1"
+   case "mittel":
+       kategorieText = "Kategorie 2"
+   case "teuer":
+       kategorieText = "Kategorie 3"
+}   
+    var String zeit1H =  zeit1.split(':').get(0)
+    var String zeit1M =  zeit1.split(':').get(1)
+    var String zeit2H =  zeit2.split(':').get(0)
+    var String zeit2M =  zeit2.split(':').get(1)
+    var String deleteString = "ListenItem"+zeit1H+zeit1M+"_"+zeit2H+zeit2M+"WE"
+    var String DatenZusammengefuegt = zeit1 + " - " + zeit2 + " | " +kategorieText+" "+kategorie   
+    org.openhab.core.model.script.ScriptServiceUtil.getItemRegistry.remove(deleteString)
+    var listItem = new StringItem(deleteString) 
+    org.openhab.core.model.script.ScriptServiceUtil.getItemRegistry.add(listItem)  
+    ListeStromStringWochenende.addMember(listItem)
+    ListeStromStringWochenende.members.get(ListeStromStringWochenende.members.size-1).postUpdate(DatenZusammengefuegt)
+    j++
+  }
+TimerBefehl.postUpdate("WARTEN")
+UberhitzungsBoolean.postUpdate(OFF)
+if(infrarotheizungBetriebsDauerTimer.state == NULL){
+      infrarotheizungBetriebsDauerTimer.postUpdate(OFF)
+      hitzeschutzDauerTimer.postUpdate(OFF)
+}

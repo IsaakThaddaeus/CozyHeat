@@ -1,0 +1,32 @@
+if(TimerMenge.state == NULL){
+  TimerMenge.postUpdate(0)
+}
+var menge = 1 +  (TimerMenge.state as Number).intValue
+val number =  menge
+TimerMenge.postUpdate(number)
+
+
+  logInfo("Timer","Ausgeführt"+ (TimerMenge.state as Number).intValue)
+  if(TimerBefehl.state == "BETRIEB"){
+            Shelly25PMKanal0.postUpdate("AKTIVIERT")
+     
+    createTimer( now.plusMinutes((LZaktivierung.state as Number).longValue), [ |
+    if(number == (TimerMenge.state as Number).intValue){
+       logInfo("Timer","ABGESCHLOSSEN BETRIEB"+ (TimerMenge.state as Number).intValue )
+       UberhitzungsBoolean.postUpdate(ON)
+       
+       TimerMenge.postUpdate(0)
+    } ])
+    
+  }
+   if(TimerBefehl.state == "SCHUTZ" || TimerBefehl.state == "WARTEN"){
+        Shelly25PMKanal0.postUpdate("DEAKTIVIERT")
+      
+    createTimer(now.plusMinutes((PauseDeaktivierung.state as Number).longValue), [ |
+    if(number == (TimerMenge.state as Number).intValue){
+       logInfo("Timer","ABGESCHLOSSEN SCHUTZ"+ (TimerMenge.state as Number).intValue )
+       UberhitzungsBoolean.postUpdate(OFF)
+       TimerMenge.postUpdate(0)
+    } ])
+   }
+  

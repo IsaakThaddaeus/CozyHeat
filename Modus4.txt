@@ -1,0 +1,90 @@
+uid: Modus4
+tags: []
+props:
+  parameters:
+    - description: Das ist die Überschrift
+      label: Überschrift
+      name: ueberschrift
+      required: false
+      type: TEXT
+  parameterGroups: []
+timestamp: Jan 24, 2024, 6:52:53 PM
+component: f7-card
+config:
+  style:
+    background-color: rgba(165, 165, 165, 0.7)
+    border-radius: 20px
+    color: "#C31D30"
+    text-align: center
+  stylesheet: >
+    .card-header {
+      justify-content: center;
+      font-size: 27px; 
+    }
+  title: Modus 4
+slots:
+  default:
+    - component: f7-row
+      config:
+        style:
+          align-items: center
+          height: 100px
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: Black
+                      font-size: 25px
+                      text-align: center
+                    text: Sobald der erzeugte Strom über die angegebene Wattzahl steigt, wird Warmwasserboiler aktiviert.
+    - component: f7-row
+      config:
+        style:
+          align-items: center
+          height: 125px
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: f7-list
+                  slots:
+                    default:
+                      - component: f7-list-item
+                      - component: f7-list-item
+                        config:
+                          style:
+                            color: black
+                            font-size: 25px
+                            padding-bottom: 10px
+                            padding-top: 10px
+                          title: Aktivierungsgrenze (in Watt)
+                        slots:
+                          after:
+                            - component: oh-stepper
+                              config:
+                                autorepeat: true
+                                autorepeatDynamic: true
+                                color: "#FBE4A0"
+                                disabled: false
+                                enableInput: true
+                                fill: true
+                                input: true
+                                item: Modus4Aktivierungsgrenze
+                                max: 10000
+                                step: 1
+                                style:
+                                  --f7-stepper-border-radius: 10px
+                                  --f7-stepper-border-width: 0px
+                                  --f7-stepper-button-text-color: black
+                                  --f7-stepper-fill-button-bg-color: "#EF744E"
+                                  --f7-stepper-value-font-size: 23px
+                                  --f7-stepper-value-text-color: black
+                                  --f7-stepper-value-width: 400px
+                                  border-radius: px
+                                  height: 70px
+                                text: "12"

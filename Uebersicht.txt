@@ -1,0 +1,119 @@
+uid Uebersicht
+tags []
+props
+  parameters
+    - description Das ist die Überschrift
+      label Überschrift
+      name ueberschrift
+      required false
+      type TEXT
+    - description Das ist die Bezeichnung des aktuellen Zeitraums
+      label Aktuell
+      name aktuell
+      required false
+      type TEXT
+    - context item
+      description Item für Aktuell
+      label Item
+      name itemaktuell
+      required false
+      type TEXT
+    - description Das ist die Bezeichnung des vorherigen Zeitraums
+      label Vorhergehend
+      name vorhergehend
+      required false
+      type TEXT
+    - context item
+      description Item für Vorhergehend
+      label Item
+      name itemvorhergehend
+      required false
+      type TEXT
+  parameterGroups []
+timestamp Jan 23, 2024, 44638 PM
+component f7-card
+config
+  style
+    background-color rgba(165, 165, 165, 0.7)
+    border-radius 20px
+    text-align center
+  stylesheet 
+    .card-header {
+      justify-content center;
+      font-size 27px; 
+    }
+  title '=(props.ueberschrift)  props.ueberschrift  Titel'
+slots
+  default
+    - component f7-row
+      config
+        style
+          height 200px
+          justify-content center
+          padding-right 17px
+      slots
+        default
+          - component f7-col
+            config
+              style
+                height 200px
+                padding-left 16px
+                width 150px
+            slots
+              default
+                - component f7-card
+                  config
+                    style
+                      background-color #383838
+                      border-radius 20px
+                      height 180px
+                      justify-content center
+                      width 140px
+                  slots
+                    default
+                      - component Label
+                        config
+                          style
+                            color white
+                            font-size 25px
+                            padding-top 25px
+                          text '=(props.aktuell)  props.aktuell  Aktuell'
+                      - component Label
+                        config
+                          style
+                            color #FBE4A0
+                            font-size 30px
+                            padding-top 20px
+                          text =items[props.itemaktuell].state
+          - component f7-col
+            config
+              style
+                height 200px
+                padding-left 15px
+                width 150px
+            slots
+              default
+                - component f7-card
+                  config
+                    style
+                      background-color #383838
+                      border-radius 20px
+                      height 180px
+                      justify-content center
+                      width 140px
+                  slots
+                    default
+                      - component Label
+                        config
+                          style
+                            color white
+                            font-size 25px
+                            padding-top 25px
+                          text '=(props.vorhergehend)  props.vorhergehend  Aktuell'
+                      - component Label
+                        config
+                          style
+                            color #FBE4A0
+                            font-size 30px
+                            padding-top 20px
+                          text =items[props.itemvorhergehend].state

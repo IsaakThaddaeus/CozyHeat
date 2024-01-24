@@ -1,0 +1,32 @@
+uid: Image
+tags: []
+props:
+  parameters:
+    - description: Das ist die Überschrift
+      label: Überschrift
+      name: ueberschrift
+      required: false
+      type: TEXT
+  parameterGroups: []
+timestamp: Jan 23, 2024, 5:56:35 PM
+component: f7-card
+config:
+  style:
+    background-color: transparent
+    height: 400px
+    justify-content: center
+slots:
+  default:
+    - component: f7-row
+      config:
+        style:
+          justify-content: center
+      slots:
+        default:
+          - component: oh-image
+            config:
+              style:
+                height: 500px
+                position: center
+                width: 550px
+              url: '=(props.ueberschrift) ? props.ueberschrift : "Titel"'

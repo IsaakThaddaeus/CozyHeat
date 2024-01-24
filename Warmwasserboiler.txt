@@ -1,0 +1,51 @@
+config:
+  label: Warmwasserboiler
+  style:
+    background: url('/static/WWB.jpg')
+    background-position: center
+    background-size: cover
+blocks:
+  - component: oh-block
+    config: {}
+    slots:
+      default:
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Modus1
+                      config:
+                        ueberschrift: Modus 1
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Modus2
+                      config: {}
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Modus3
+                      config: {}
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Modus4
+                      config: {}
+masonry: null
+grid: []
+canvas: []

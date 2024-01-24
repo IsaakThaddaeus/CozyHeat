@@ -1,0 +1,78 @@
+uid: Intervall
+tags: []
+props:
+  parameters: []
+  parameterGroups: []
+timestamp: Jan 23, 2024, 7:24:04 PM
+component: f7-card
+config:
+  style:
+    align-items: center
+    background: '=(props.background) ? props.background : "#A5A5A5"'
+    background-color: rgba(165, 165, 165, 0.7)
+    border-radius: 20px
+    text-align: center
+  stylesheet: >
+    .card-header {
+      justify-content: center;
+      font-size: 27px; 
+    }
+  title: Aktuell produzierter Strom (in Watt)
+slots:
+  default:
+    - component: f7-row
+      config:
+        style:
+          justify-content: center
+          padding-top: 20px
+      slots:
+        default:
+          - component: f7-card
+            config:
+              style:
+                background-color: "#383838"
+                border-radius: 20px
+                height: 200px
+                width: 200px
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: "#FBE4A0"
+                      font-size: 60px
+                      padding-top: 44px
+                    text: =items.produzierterStrom.state
+    - component: f7-list
+      slots:
+        default:
+          - component: f7-list-item
+          - component: f7-list-item
+            config:
+              style:
+                font-size: 20px
+                padding-bottom: 10px
+                padding-top: 10px
+              title: Intervall (in min)
+            slots:
+              after:
+                - component: oh-stepper
+                  config:
+                    autorepeat: true
+                    autorepeatDynamic: true
+                    color: "#EF744E"
+                    disabled: false
+                    enableInput: true
+                    fill: true
+                    input: true
+                    item: IntervallUeberpruefung
+                    step: 1
+                    style:
+                      --f7-stepper-border-radius: 10px
+                      --f7-stepper-border-width: 0px
+                      --f7-stepper-button-text-color: black
+                      --f7-stepper-fill-button-bg-color: "#EF744E"
+                      --f7-stepper-value-font-size: 23px
+                      --f7-stepper-value-text-color: black
+                      --f7-stepper-value-width: 400px
+                    text: "12"

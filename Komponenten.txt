@@ -1,0 +1,80 @@
+uid: Komponenten
+tags: []
+props:
+  parameters: []
+  parameterGroups: []
+timestamp: Jan 24, 2024, 8:45:58 PM
+component: f7-card
+config:
+  style:
+    background-color: rgba(143, 21, 36, 0.9)
+    border-radius: 20px
+slots:
+  default:
+    - component: f7-card
+      config:
+        style:
+          background: url('/static/Infrarotheizung.png')
+          background-color: transparent
+          background-position: 430px
+          background-repeat: no-repeat
+          background-size: 110px
+          border-radius: 20px
+          width: 99%
+      slots:
+        default:
+          - component: f7-row
+            slots:
+              default:
+                - component: f7-col
+                  config:
+                    style:
+                      border-radius: 20px
+                      width: 75%
+                  slots:
+                    default:
+                      - component: oh-link
+                        config:
+                          action: popup
+                          actionModal: widget:Infrarotheizung
+                          actionPage: widget:Infrarotheizung
+                          color: white
+                          style:
+                            border-radius: 20px
+                            width: 100%
+                        slots:
+                          default:
+                            - component: oh-image
+                              config: {}
+                            - component: Label
+                              config:
+                                style:
+                                  color: "#F8D05E"
+                                  font-weight: bold
+                                  fontSize: 40px
+                                  padding-top: 35px
+                                text: Infrarotheizung
+                - component: f7-col
+                  config:
+                    style:
+                      background-color: rgba(0, 0, 0, 0.7)
+                      border-radius: 20px
+                      height: 120px
+                      padding-right: 50px
+                      width: 150px
+                  slots:
+                    default:
+                      - component: oh-toggle
+                        config:
+                          action: toggle
+                          color: yellow
+                          item: =props.item
+                          style:
+                            --f7-toggle-active-bg-color: purple
+                            --f7-toggle-active-knob-bg-color: red
+                            --f7-toggle-height: 30px
+                            --f7-toggle-inactive-bg-color: yellow
+                            --f7-toggle-inactive-knob-bg-color: blue
+                            --f7-toggle-width: 65px
+                            padding-left: 42%
+                            padding-top: 45px

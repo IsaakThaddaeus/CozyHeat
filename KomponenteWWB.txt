@@ -1,0 +1,145 @@
+uid: KomponenteWWB
+tags: []
+props:
+  parameters: []
+  parameterGroups: []
+timestamp: Jan 24, 2024, 8:47:39 PM
+component: f7-card
+config:
+  style:
+    background-color: rgba(248, 208, 94, 0.9)
+    border-radius: 20px
+slots:
+  default:
+    - component: f7-card
+      config:
+        style:
+          background: url('/static/Warmwasserboiler.png')
+          background-color: transparent
+          background-position: 430px
+          background-repeat: no-repeat
+          background-size: 110px
+          border-radius: 20px
+          width: 99%
+      slots:
+        default:
+          - component: f7-row
+            config:
+              style:
+                align-items: center
+            slots:
+              default:
+                - component: f7-col
+                  config:
+                    style:
+                      border-radius: 20px
+                      width: 70%
+                  slots:
+                    default:
+                      - component: oh-link
+                        config:
+                          action: navigate
+                          actionModal: page:Warmwasserboiler
+                          actionPage: page:Warmwasserboiler
+                          color: white
+                          style:
+                            border-radius: 20px
+                            width: 100%
+                        slots:
+                          default:
+                            - component: Label
+                              config:
+                                style:
+                                  color: "#C31D30"
+                                  font-size: 40px
+                                  font-weight: bold
+                                  padding-bottom: 30px
+                                  padding-top: 30px
+                                text: Warmwasserboiler
+                - component: f7-col
+                  config:
+                    style:
+                      align-items: center
+                      background-color: rgba(0, 0, 0, 0.7)
+                      border-radius: 20px
+                      height: 121px
+                      padding-left: 14px
+                      padding-top: 44px
+                      width: 150px
+                  slots:
+                    default:
+                      - component: oh-button
+                        config:
+                          action: popover
+                          popoverOpen: .detailList
+                          style:
+                            --f7-button-hover-bg-color: rgba(165, 165, 165, 0.9)
+                            background-color: "#F8D05E"
+                            color: black
+                            height: 30px
+                            width: 120px
+                          text: =items["AktiverModus"].state
+                        slots:
+                          default:
+                            - component: f7-popover
+                              config:
+                                animate: true
+                                arrow: true
+                                backdrop: true
+                                class: detailList
+                                clickToClode: true
+                                closeByBackdropClick: true
+                                closeByInsideClick: true
+                                closeByOutsideClick: true
+                                closeOnEscape: true
+                                style:
+                                  --f7-popover-bg-color: "#F8D05E"
+                                  --f7-popover-border-radius: 4px
+                                  --f7-popover-width: 180px
+                              slots:
+                                default:
+                                  - component: oh-list
+                                    config:
+                                      title: Test
+                                    slots:
+                                      default:
+                                        - component: oh-button
+                                          config:
+                                            action: command
+                                            actionCommand: Modus-1
+                                            actionItem: AktiverModus
+                                            popover-close: true
+                                            style:
+                                              --f7-button-hover-bg-color: rgba(165, 165, 165, 0.9)
+                                              color: black
+                                            text: Modus 1
+                                        - component: oh-button
+                                          config:
+                                            action: command
+                                            actionCommand: Modus-2
+                                            actionItem: AktiverModus
+                                            popover-close: true
+                                            style:
+                                              --f7-button-hover-bg-color: rgba(165, 165, 165, 0.9)
+                                              color: black
+                                            text: Modus 2
+                                        - component: oh-button
+                                          config:
+                                            action: command
+                                            actionCommand: Modus-3
+                                            actionItem: AktiverModus
+                                            popover-close: true
+                                            style:
+                                              --f7-button-hover-bg-color: rgba(165, 165, 165, 0.9)
+                                              color: black
+                                            text: Modus 3
+                                        - component: oh-button
+                                          config:
+                                            action: command
+                                            actionCommand: Modus-4
+                                            actionItem: AktiverModus
+                                            popover-close: true
+                                            style:
+                                              --f7-button-hover-bg-color: rgba(165, 165, 165, 0.9)
+                                              color: black
+                                            text: Modus 4

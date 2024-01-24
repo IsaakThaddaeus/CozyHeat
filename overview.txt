@@ -1,0 +1,120 @@
+config:
+  label: Übersicht
+  style:
+    background: url('/static/BG2.jpg')
+    background-position: center
+    background-size: cover
+blocks:
+  - component: oh-block
+    config: {}
+    slots:
+      default:
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Intervall
+                      config: {}
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Image
+                      config:
+                        ueberschrift: /static/Logo2.png
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Uebersicht
+                      config:
+                        aktuell: Heute
+                        itemaktuell: TagHeute
+                        itemvorhergehend: TagGestern
+                        ueberschrift: Tag (in kWh)
+                        vorhergehend: Gestern
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Uebersicht
+                      config:
+                        aktuell: Diese Woche
+                        itemaktuell: WocheAktuell
+                        itemvorhergehend: WocheLetztes
+                        ueberschrift: Woche (in kWh)
+                        vorhergehend: Letzte Woche
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Uebersicht
+                      config:
+                        aktuell: Dieser Monat
+                        itemaktuell: MonatAktuell
+                        itemvorhergehend: MonatLetzter
+                        ueberschrift: Monat (in kWh)
+                        vorhergehend: Letzter Monat
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Uebersicht
+                      config:
+                        aktuell: Dieses Jahr
+                        itemaktuell: JahrAkutell
+                        itemvorhergehend: JahrLetztes
+                        ueberschrift: Jahr (in kWh)
+                        vorhergehend: Letztes Jahr
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:Komponenten
+                      config:
+                        Wechselkomponente: widget:Infrarotheizung
+                        action: popup
+                        item: InfrarotheizungItem
+                        komponente: Infrarotheizung
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:KomponenteWWB
+                      config:
+                        Wechselkomponente: page:Warmwasserboiler
+                        action: navigate
+                        komponente: Warmwasserboiler
+  - component: oh-block
+    config: {}
+    slots:
+      default:
+        - component: oh-grid-row
+          config: {}
+          slots:
+            default:
+              - component: oh-grid-col
+                config: {}
+                slots:
+                  default:
+                    - component: widget:test_chart
+                      config: {}
+masonry:
+  - component: oh-masonry
+    config: {}
+    slots:
+      default: []
+grid: null
+canvas: null

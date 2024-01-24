@@ -1,0 +1,456 @@
+uid: Infrarotheizung
+tags: []
+props:
+  parameters: []
+  parameterGroups: []
+timestamp: Jan 24, 2024, 6:51:48 PM
+component: f7-card
+config:
+  style:
+    background-color: rgba(165, 165, 165, 0.7)
+    border-radius: 20px
+    color: "#C31D30"
+    text-align: center
+  stylesheet: >
+    .card-header {
+      justify-content: center;
+      font-size: 27px;
+    }
+  title: Infrarotheizung
+slots:
+  default:
+    - component: f7-card
+      config:
+        style:
+          background-color: transparent
+      slots:
+        default:
+          - component: f7-segmented
+            config:
+              raised: false
+              strong: true
+              style:
+                --f7-segmented-strong-button-active-bg-color: "#EF744E"
+            slots:
+              default:
+                - component: oh-button
+                  config:
+                    action: toggle
+                    actionCommand: OFF
+                    actionItem: SwitchEinfachErweitert
+                    active: =(items["SwitchEinfachErweitert"].state === 'OFF')
+                    style:
+                      font-size: 17px
+                    text: Einfach
+                - component: oh-button
+                  config:
+                    action: command
+                    actionCommand: ON
+                    actionItem: SwitchEinfachErweitert
+                    active: =(items["SwitchEinfachErweitert"].state === 'ON')
+                    style:
+                      font-size: 17px
+                    text: Erweitert
+    - component: f7-row
+      config:
+        style:
+          text-align: right
+      slots:
+        default:
+          - component: f7-col
+            config: {}
+            slots:
+              default:
+                - component: f7-list
+                  slots:
+                    default:
+                      - component: f7-list-item
+                        config:
+                          style:
+                            padding-bottom: 15px
+                      - component: f7-list-item
+                        config:
+                          style:
+                            color: black
+                            font-size: 20px
+                            padding-bottom: 20px
+                          title: Wattgrenze für die Aktivierung (in Watt)
+                        slots:
+                          after:
+                            - component: oh-stepper
+                              config:
+                                autorepeat: true
+                                autorepeatDynamic: true
+                                color: "#EF744E"
+                                disabled: false
+                                enableInput: true
+                                fill: true
+                                input: true
+                                item: WattGrenzeFuerAktivierung
+                                max: 10000
+                                min: 0
+                                round: true
+                                step: 1
+                                style:
+                                  --f7-stepper-border-radius: 10px
+                                  --f7-stepper-border-width: 0px
+                                  --f7-stepper-button-text-color: black
+                                  --f7-stepper-fill-button-bg-color: "#EF744E"
+                                  --f7-stepper-value-font-size: 23px
+                                  --f7-stepper-value-text-color: black
+                                  --f7-stepper-value-width: 400px
+                      - component: f7-list-item
+                        config:
+                          style:
+                            color: black
+                            font-size: 20px
+                            padding-bottom: 20px
+                          title: Betriebsdauer der Heizung (in min)
+                        slots:
+                          after:
+                            - component: oh-stepper
+                              config:
+                                autorepeat: true
+                                autorepeatDynamic: true
+                                color: "#EF744E"
+                                disabled: false
+                                enableInput: true
+                                fill: true
+                                input: true
+                                item: LZaktivierung
+                                max: 1500
+                                min: 0
+                                round: true
+                                step: 1
+                                style:
+                                  --f7-stepper-border-radius: 10px
+                                  --f7-stepper-border-width: 0px
+                                  --f7-stepper-button-text-color: black
+                                  --f7-stepper-fill-button-bg-color: "#EF744E"
+                                  --f7-stepper-value-font-size: 23px
+                                  --f7-stepper-value-text-color: black
+                                  --f7-stepper-value-width: 400px
+                      - component: f7-list-item
+                        config:
+                          style:
+                            color: black
+                            font-size: 20px
+                          title: Dauer Überhitzungsschutz (in min)
+                        slots:
+                          after:
+                            - component: Label
+                              config:
+                                style:
+                                  color: black
+                                  font-size: 22px
+                                  padding-right: 20px
+                                text: =items['UberhitzungsBoolean'].state
+                            - component: oh-stepper
+                              config:
+                                autorepeat: true
+                                autorepeatDynamic: true
+                                color: "#EF744E"
+                                disabled: false
+                                enableInput: true
+                                fill: true
+                                input: true
+                                item: PauseDeaktivierung
+                                max: 1500
+                                min: 0
+                                round: true
+                                step: 1
+                                style:
+                                  --f7-stepper-border-radius: 10px
+                                  --f7-stepper-border-width: 0px
+                                  --f7-stepper-button-text-color: black
+                                  --f7-stepper-fill-button-bg-color: "#EF744E"
+                                  --f7-stepper-value-font-size: 23px
+                                  --f7-stepper-value-text-color: black
+                                  --f7-stepper-value-width: 400px
+    - component: f7-row
+      config:
+        style:
+          height: 30px
+    - component: f7-row
+      config:
+        style:
+          padding-top: 20px
+      slots:
+        default:
+          - component: f7-col
+            config:
+              style:
+                padding-bottom: 25px
+                width: 49%
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 20px
+                      font-weight: bold
+                      text-align: center
+                    text: Temperatur (in °C)
+          - component: f7-col
+            config:
+              style:
+                border: 1px solid
+                color: black
+                height: 60px
+                width: 1px
+          - component: f7-col
+            config:
+              style:
+                width: 49%
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 20px
+                      font-weight: bold
+                      text-align: center
+                    text: Luftfeuchtigkeit (in %)
+    - component: f7-row
+      config:
+        style:
+          align-items: center
+          padding-bottom: 30px
+      slots:
+        default:
+          - component: f7-col
+            config:
+              style:
+                align-items: center
+                height: 100%
+                padding-left: 50px
+                text-align: center
+                width: 30%
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 15px
+                      padding-bottom: 10px
+                    text: Obergrenze
+                - component: oh-stepper
+                  config:
+                    autorepeat: true
+                    autorepeatDynamic: true
+                    color: red
+                    disabled: false
+                    enableInput: true
+                    fill: true
+                    input: true
+                    item: obergrenzeT
+                    round: true
+                    step: 1
+                    style:
+                      --f7-stepper-border-radius: 10px
+                      --f7-stepper-border-width: 0px
+                      --f7-stepper-button-text-color: black
+                      --f7-stepper-fill-button-bg-color: "#C31D30"
+                      --f7-stepper-value-font-size: 23px
+                      --f7-stepper-value-text-color: black
+                      --f7-stepper-value-width: 400px
+                      height: 50px
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 14px
+                      font-weight: bold
+                      padding-top: 20px
+                    text: Aktuelle Zimmertemparatur
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 30px
+                      font-weight: bold
+                      padding-bottom: 20px
+                    text: =items["Temperatur"].state + " °C"
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 15px
+                      padding-bottom: 10px
+                    text: Untergrenze
+                - component: oh-stepper
+                  config:
+                    autorepeat: true
+                    autorepeatDynamic: true
+                    color: red
+                    disabled: false
+                    enableInput: true
+                    fill: true
+                    input: true
+                    item: untergrenzeT
+                    round: true
+                    step: 1
+                    style:
+                      --f7-stepper-border-radius: 10px
+                      --f7-stepper-border-width: 0px
+                      --f7-stepper-button-text-color: black
+                      --f7-stepper-fill-button-bg-color: "#C31D30"
+                      --f7-stepper-value-font-size: 23px
+                      --f7-stepper-value-text-color: black
+                      --f7-stepper-value-width: 400px
+                      height: 50px
+          - component: f7-col
+            config:
+              style:
+                height: 310px
+                width: 70px
+            slots:
+              default:
+                - component: f7-range
+                  config:
+                    disabled: true
+                    draggableBar: false
+                    dual: true
+                    label: true
+                    max: 50
+                    min: 0
+                    scale: true
+                    style:
+                      --f7-range-bar-bg-color: grey
+                      --f7-range-bar-border-radius: 8px
+                      --f7-range-bar-color: white
+                      --f7-range-bar-size: 40px
+                      --f7-range-knob-color: "#C31D30"
+                      --f7-range-knob-size: 0px
+                      --f7-range-scale-text-color: black
+                      --f7-theme-color: "#C31D30"
+                      opacity: 1
+                      padding-left: 60px
+                    value:
+                      - =Number.parseInt(items.untergrenzeT.state)
+                      - =Number.parseInt(items.obergrenzeT.state)
+                    vertical: true
+          - component: f7-col
+            config:
+              style:
+                border: 1px solid
+                color: black
+                height: 310px
+                width: 1px
+          - component: f7-col
+            config:
+              style:
+                height: 310px
+                width: 11.8%
+            slots:
+              default:
+                - component: f7-range
+                  config:
+                    disabled: true
+                    draggableBar: false
+                    dual: true
+                    label: true
+                    max: 100
+                    min: 0
+                    scale: true
+                    style:
+                      --f7-range-bar-bg-color: grey
+                      --f7-range-bar-border-radius: 8px
+                      --f7-range-bar-color: white
+                      --f7-range-bar-size: 40px
+                      --f7-range-knob-color: "#C31D30"
+                      --f7-range-knob-size: 0px
+                      --f7-range-scale-text-color: black
+                      --f7-theme-color: "#4472C4"
+                      opacity: 1
+                      padding-left: 70px
+                    value:
+                      - =Number.parseInt(items.untergrenzeL.state)
+                      - =Number.parseInt(items.obergrenzeL.state)
+                    vertical: true
+          - component: f7-col
+            config:
+              style:
+                align-items: center
+                height: 100%
+                padding-right: 40px
+                text-align: center
+                width: 30%
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 15px
+                      padding-bottom: 10px
+                    text: Obergrenze
+                - component: oh-stepper
+                  config:
+                    autorepeat: true
+                    autorepeatDynamic: true
+                    color: blue
+                    disabled: false
+                    enableInput: true
+                    fill: true
+                    input: true
+                    item: obergrenzeL
+                    round: true
+                    step: 1
+                    style:
+                      --f7-stepper-border-radius: 10px
+                      --f7-stepper-border-width: 0px
+                      --f7-stepper-button-text-color: black
+                      --f7-stepper-fill-button-bg-color: "#4472C4"
+                      --f7-stepper-value-font-size: 23px
+                      --f7-stepper-value-text-color: black
+                      --f7-stepper-value-width: 400px
+                      height: 50px
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 14px
+                      font-weight: bold
+                      padding-top: 20px
+                    text: Aktuelle Luftfeuchtigkeit
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 30px
+                      font-weight: bold
+                      padding-bottom: 20px
+                      padding-top: 0px
+                    text: =items["Luftfeuchtigkeit"].state + " %"
+                - component: Label
+                  config:
+                    style:
+                      color: black
+                      font-size: 15px
+                      padding-bottom: 10px
+                    text: Untergrenze
+                - component: oh-stepper
+                  config:
+                    autorepeat: true
+                    autorepeatDynamic: true
+                    color: blue
+                    disabled: false
+                    enableInput: true
+                    fill: true
+                    input: true
+                    item: untergrenzeL
+                    round: true
+                    step: 1
+                    style:
+                      --f7-stepper-border-radius: 10px
+                      --f7-stepper-border-width: 0px
+                      --f7-stepper-button-text-color: black
+                      --f7-stepper-fill-button-bg-color: "#4472C4"
+                      --f7-stepper-value-font-size: 23px
+                      --f7-stepper-value-text-color: black
+                      --f7-stepper-value-width: 400px
+                      height: 50px

@@ -1,0 +1,137 @@
+uid: Modus2
+tags: []
+props:
+  parameters:
+    - description: Das ist die Überschrift
+      label: Überschrift
+      name: ueberschrift
+      required: false
+      type: TEXT
+  parameterGroups: []
+timestamp: Jan 23, 2024, 4:48:42 PM
+component: f7-card
+config:
+  style:
+    background-color: rgba(165, 165, 165, 0.7)
+    border-radius: 20px
+    color: "#C31D30"
+    text-align: center
+  stylesheet: >
+    .card-header {
+      justify-content: center;
+      font-size: 27px; 
+    }
+  title: Modus 2
+slots:
+  default:
+    - component: f7-row
+      config:
+        style:
+          align-items: center
+          height: 100px
+      slots:
+        default:
+          - component: f7-col
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: Black
+                      font-size: 30px
+                      text-align: center
+                    text: Boiler aktivieren
+    - component: f7-row
+      config:
+        style:
+          align-items: center
+          height: 100px
+          padding-right: 45px
+      slots:
+        default:
+          - component: f7-col
+            config:
+              style:
+                text-align: right
+                width: 100px
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: Black
+                      font-size: 30px
+                      padding-bottom: 20px
+                      padding-top: 20px
+                    text: Von
+          - component: f7-col
+            config:
+              style:
+                text-align: left
+                width: 180px
+            slots:
+              default:
+                - component: f7-card
+                  config:
+                    style:
+                      --f7-card-bg-color: "#EF744E"
+                      height: 35px
+                      padding-top: 3px
+                      width: 240px
+                  slots:
+                    default:
+                      - component: oh-input
+                        config:
+                          autoupdate: false
+                          item: Modus2Datum1
+                          sendButton: true
+                          style:
+                            --f7-input-clear-button-color: black
+                            color: Black
+                            font-size: 24px
+                          type: date
+          - component: f7-col
+            config:
+              style:
+                text-align: right
+                width: 15%
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: Black
+                      font-size: 30px
+                      padding-bottom: 20px
+                      padding-top: 20px
+                    text: Bis
+          - component: f7-col
+            config:
+              style:
+                text-align: left
+                width: 180px
+            slots:
+              default:
+                - component: f7-card
+                  config:
+                    style:
+                      --f7-card-bg-color: "#EF744E"
+                      backgorund-color: white
+                      height: 35px
+                      padding-top: 3px
+                      width: 240px
+                  slots:
+                    default:
+                      - component: oh-input
+                        config:
+                          item: Modus2Datum2
+                          sendButton: true
+                          style:
+                            color: Black
+                            font-size: 24px
+                          type: date
+          - component: f7-col
+            config:
+              style:
+                text-align: left
+                width: 10%

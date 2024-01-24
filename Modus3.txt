@@ -1,0 +1,568 @@
+uid: Modus3
+tags: []
+props:
+  parameters: []
+  parameterGroups: []
+timestamp: Jan 23, 2024, 4:27:20 PM
+component: f7-card
+config:
+  style:
+    background-color: rgba(165, 165, 165, 0.7)
+    border-radius: 20px
+    color: "#C31D30"
+    text-align: center
+  stylesheet: >
+    .card-header {
+      justify-content: center;
+      font-size: 27px;
+    }
+  title: Modus 3
+slots:
+  default:
+    - component: f7-card
+      config:
+        style:
+          background-color: "#FBE4A0"
+          border-radius: 10px
+      slots:
+        default:
+          - component: f7-row
+            config:
+              style:
+                align-items: center
+            slots:
+              default:
+                - component: f7-col
+                  config:
+                    style:
+                      text-align: right
+                      width: 60px
+                  slots:
+                    default:
+                      - component: Label
+                        config:
+                          style:
+                            color: black
+                            font-size: 20px
+                          text: Von
+                - component: f7-col
+                  config:
+                    style:
+                      width: 150px
+                  slots:
+                    default:
+                      - component: f7-card
+                        config:
+                          style:
+                            background-color: "#EF744E"
+                            height: 30px
+                            width: 145px
+                        slots:
+                          default:
+                            - component: oh-input
+                              config:
+                                autosave: true
+                                disabled: false
+                                inputmode: text
+                                item: Modus3Zeit1
+                                placeholder: Hallo
+                                sendButton: true
+                                showTime: true
+                                style:
+                                  color: black
+                                  font-size: 20px
+                                  padding-top: 0%
+                                  width: 120px
+                                text: Von
+                                type: time
+                                useDisplayState: true
+                                validate: true
+                - component: f7-col
+                  config:
+                    style:
+                      text-align: left
+                      width: 50px
+                  slots:
+                    default:
+                      - component: Label
+                        config:
+                          style:
+                            color: black
+                            font-size: 20px
+                          text: Uhr
+                - component: f7-col
+                  config:
+                    style:
+                      text-align: Right
+                      width: 50px
+                  slots:
+                    default:
+                      - component: Label
+                        config:
+                          style:
+                            color: black
+                            font-size: 20px
+                          text: Bis
+                - component: f7-col
+                  config:
+                    style:
+                      width: 140px
+                  slots:
+                    default:
+                      - component: f7-card
+                        config:
+                          style:
+                            background-color: "#EF744E"
+                            height: 30px
+                            width: 145px
+                        slots:
+                          default:
+                            - component: oh-input
+                              config:
+                                disabled: false
+                                item: Modus3Zeit2
+                                sendButton: true
+                                style:
+                                  color: black
+                                  font-size: 20px
+                                  padding-top: 0%
+                                  width: 120px
+                                text: Von
+                                type: time
+                - component: f7-col
+                  config:
+                    style:
+                      text-align: Right
+                      width: 50px
+                  slots:
+                    default:
+                      - component: Label
+                        config:
+                          style:
+                            color: black
+                            font-size: 20px
+                          text: Uhr
+                - component: f7-col
+                  config:
+                    style:
+                      width: 80px
+                - component: f7-col
+                  config:
+                    style:
+                      width: 140px
+                  slots:
+                    default:
+                      - component: f7-card
+                        config:
+                          style:
+                            width: 90%
+                        slots:
+                          default:
+                            - component: oh-button
+                              config:
+                                action: popover
+                                popoverOpen: .detailList
+                                style:
+                                  --f7-button-hover-bg-color: rgba(165, 165, 165, 0.9)
+                                  background-color: "#EF744E"
+                                  color: black
+                                  height: 30px
+                                  width: 180px
+                                text: =items["KategorieStrom"].state
+                              slots:
+                                default:
+                                  - component: f7-popover
+                                    config:
+                                      animate: true
+                                      arrow: true
+                                      backdrop: true
+                                      class: detailList
+                                      clickToClode: true
+                                      closeByBackdropClick: true
+                                      closeByInsideClick: true
+                                      closeByOutsideClick: true
+                                      closeOnEscape: true
+                                      style:
+                                        --f7-popover-bg-color: "#EF744E"
+                                        --f7-popover-border-radius: 4px
+                                        --f7-popover-width: 180px
+                                    slots:
+                                      default:
+                                        - component: oh-list
+                                          config:
+                                            title: Test
+                                          slots:
+                                            default:
+                                              - component: oh-button
+                                                config:
+                                                  action: command
+                                                  actionCommand: Kategorie 1 guenstig
+                                                  actionItem: KategorieStrom
+                                                  popover-close: true
+                                                  style:
+                                                    --f7-button-hover-bg-color: "#FBE4A0"
+                                                    color: black
+                                                  text: Kategorie 1 günstig
+                                              - component: oh-button
+                                                config:
+                                                  action: command
+                                                  actionCommand: Kategorie 2 mittel
+                                                  actionItem: KategorieStrom
+                                                  popover-close: true
+                                                  style:
+                                                    --f7-button-hover-bg-color: "#E54715"
+                                                    color: black
+                                                  text: Kategorie 2 mittel
+                                              - component: oh-button
+                                                config:
+                                                  action: command
+                                                  actionCommand: Kategorie 3 teuer
+                                                  actionItem: KategorieStrom
+                                                  popover-close: true
+                                                  style:
+                                                    --f7-button-hover-bg-color: "#C31D30"
+                                                    color: black
+                                                  text: Kategorie 3 teuer
+                - component: f7-col
+                  config:
+                    style:
+                      padding-left: 50px
+                      width: 300px
+                  slots:
+                    default:
+                      - component: f7-segmented
+                        config:
+                          raised: false
+                          strong: true
+                          style:
+                            --f7-segmented-strong-button-active-bg-color: "#EF744E"
+                        slots:
+                          default:
+                            - component: oh-button
+                              config:
+                                action: toggle
+                                actionCommand: ON
+                                actionItem: TagModus
+                                active: =(items["TagModus"].state === 'ON')
+                                text: Werktage
+                            - component: oh-button
+                              config:
+                                action: command
+                                actionCommand: OFF
+                                actionItem: TagModus
+                                active: =(items["TagModus"].state === 'OFF')
+                                text: Wochenende
+                - component: f7-col
+                  config:
+                    style:
+                      width: 190px
+                - component: f7-col
+                  config:
+                    style:
+                      padding-right: 10px
+                      width: 140px
+                  slots:
+                    default:
+                      - component: oh-button
+                        config:
+                          action: command
+                          actionCommand: ON
+                          actionItem: Modus3AddButton
+                          fill: true
+                          style:
+                            --f7-button-hover-bg-color: rgba(165, 165, 165, 0.9)
+                            background-color: "#EF744E"
+                            color: black
+                            height: 30px
+                          text: Hinzufügen
+    - component: f7-row
+      config:
+        style:
+          justify-content: center
+      slots:
+        default:
+          - component: Label
+            config:
+              style:
+                font-size: 20px
+              text: =items["ZeitFehlermeldung"].state
+    - component: f7-card
+      config:
+        style:
+          background-color: rgba(150, 150, 150, 0.8)
+          border-radius: 20px
+          color: black
+          height: 100%
+        title: Werktage
+      slots:
+        default:
+          - component: f7-row
+            config:
+              style:
+                align-items: center
+                height: 100%
+                justify-content: center
+                padding-top: 0px
+            slots:
+              default:
+                - component: f7-col
+                  config:
+                    style:
+                      border-color: black
+                      padding-left: 10px
+                      text-align: left
+                      width: 100%
+                  slots:
+                    default:
+                      - component: oh-list
+                        config:
+                          item: refresh
+                          noHairlinesBetween: true
+                        slots:
+                          default:
+                            - component: oh-repeater
+                              config:
+                                for: item
+                                fragement: true
+                                groupItem: ListeStromString
+                                key: =items['automatischAktualisieren'].state
+                                sourceType: itemsInGroup
+                              slots:
+                                default:
+                                  - component: oh-list-item
+                                    config:
+                                      style:
+                                        background-color: grey
+                                        border-radius: 10px
+                                        color: black
+                                        font-size: 17px
+                                        margin: 10px
+                                      title: =items[loop.item.name].state
+                - component: f7-card
+                  config:
+                    style:
+                      background-color: transparent
+                      width: 130px
+                  slots:
+                    default:
+                      - component: oh-button
+                        config:
+                          action: command
+                          actionCommand: ON
+                          actionItem: DeleteButton
+                          style:
+                            background-color: "#EF744E"
+                            border-color: transparent
+                            color: black
+                            font-size: 17px
+                            text-align: center
+                            width: 100%
+                          text: Löschen
+    - component: f7-card
+      config:
+        style:
+          background-color: rgba(150, 150, 150, 0.8)
+          border-radius: 20px
+          color: black
+          height: 100%
+        title: Wochenende
+      slots:
+        default:
+          - component: f7-row
+            config:
+              style:
+                align-items: center
+                height: 100%
+                justify-content: center
+                padding-top: 0px
+            slots:
+              default:
+                - component: f7-col
+                  config:
+                    style:
+                      border-color: black
+                      padding-left: 10px
+                      text-align: left
+                      width: 100%
+                  slots:
+                    default:
+                      - component: oh-list
+                        config:
+                          item: refresh
+                          itemSpacing: 1000px
+                          noHairlinesBetween: true
+                        slots:
+                          default:
+                            - component: oh-repeater
+                              config:
+                                for: item
+                                groupItem: ListeStromStringWochenende
+                                key: =items['automatischAktualisieren'].state
+                                sourceType: itemsInGroup
+                              slots:
+                                default:
+                                  - component: f7-row
+                                    config:
+                                      style:
+                                        width: 2000px
+                                      title: Test
+                                  - component: oh-list-item
+                                    config:
+                                      style:
+                                        background-color: grey
+                                        border-radius: 10px
+                                        color: black
+                                        font-size: 17px
+                                        margin: 6px
+                                      title: =loop.item.state
+                - component: f7-card
+                  config:
+                    style:
+                      background-color: transparent
+                      width: 130px
+                  slots:
+                    default:
+                      - component: oh-button
+                        config:
+                          action: command
+                          actionCommand: ON
+                          actionItem: DeleteButtonWochenende
+                          style:
+                            background-color: "#EF744E"
+                            border-color: transparent
+                            color: black
+                            font-size: 17px
+                            text-align: center
+                            width: 100%
+                          text: Löschen
+    - component: f7-row
+      config:
+        style:
+          align-items: center
+          height: 100px
+          justify-content: center
+      slots:
+        default:
+          - component: f7-col
+            config:
+              style:
+                border: 0px solid
+                text-align: center
+                width: 40%
+            slots:
+              default:
+                - component: Label
+                  config:
+                    style:
+                      color: Black
+                      font-size: 25px
+                      padding-bottom: 20px
+                      padding-top: 0px
+                    text: Zu welchen Zeiten soll der Boiler angeschaltet werden?
+    - component: f7-row
+      config:
+        style:
+          height: 200px
+          justify-content: center
+      slots:
+        default:
+          - component: f7-col
+            config:
+              style:
+                height: 200px
+                padding-left: 15px
+                width: 200px
+            slots:
+              default:
+                - component: f7-card
+                  config:
+                    style:
+                      background-color: "#FBE4A0"
+                      border-radius: 20px
+                      height: 170px
+                      justify-content: center
+                      width: 170px
+                  slots:
+                    default:
+                      - component: Label
+                        config:
+                          style:
+                            color: black
+                            font-size: 25px
+                            padding-top: 25px
+                          text: Günstig
+                      - component: oh-toggle
+                        config:
+                          color: yellow
+                          item: GuenstigAktiviert
+                          style:
+                            --f7-toggle-height: 35px
+                            --f7-toggle-width: 80px
+                            padding-top: 40px
+          - component: f7-col
+            config:
+              style:
+                height: 200px
+                padding-left: 15px
+                width: 200px
+            slots:
+              default:
+                - component: f7-card
+                  config:
+                    style:
+                      background-color: "#EF744E"
+                      border-radius: 20px
+                      height: 170px
+                      justify-content: center
+                      width: 170px
+                  slots:
+                    default:
+                      - component: Label
+                        config:
+                          style:
+                            color: black
+                            font-size: 25px
+                            padding-top: 25px
+                          text: Mittel
+                      - component: oh-toggle
+                        config:
+                          color: yellow
+                          item: MittelAktiviert
+                          style:
+                            --f7-toggle-height: 35px
+                            --f7-toggle-width: 80px
+                            padding-top: 40px
+          - component: f7-col
+            config:
+              style:
+                height: 200px
+                justify-content: center
+                padding-left: 15px
+                width: 200px
+            slots:
+              default:
+                - component: f7-card
+                  config:
+                    style:
+                      background-color: "#C31D30"
+                      border-radius: 20px
+                      height: 170px
+                      justify-content: center
+                      width: 170px
+                  slots:
+                    default:
+                      - component: Label
+                        config:
+                          style:
+                            color: black
+                            font-size: 25px
+                            padding-top: 25px
+                          text: Teuer
+                      - component: oh-toggle
+                        config:
+                          color: yellow
+                          item: TeuerAktiviert
+                          style:
+                            --f7-toggle-height: 35px
+                            --f7-toggle-width: 80px
+                            padding-top: 40px

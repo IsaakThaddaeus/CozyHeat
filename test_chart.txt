@@ -1,0 +1,405 @@
+uid: test_chart
+tags:
+  - online
+props:
+  parameterGroups: []
+timestamp: Jan 23, 2024, 4:40:43 PM
+component: f7-card
+config:
+  backdrop: false
+  class:
+    - no-padding
+  expandable: false
+  style:
+    --f7-theme-color: var(--f7-text-color)
+    background-color: rgba(165, 165, 165, 0.9)
+    border-radius: var(--f7-card-expandable-border-radius)
+    box-shadow: var(--f7-card-expandable-box-shadow)
+    height: 600px
+    margin-bottom: 10px
+    margin-left: 5px
+    margin-right: 5px
+    margin-top: 10px
+    width: 100%
+  swipeToClose: false
+slots:
+  default:
+    - component: oh-link
+      config:
+        action: navigate
+        actionItem: produzierterStrom
+        actionPageTransition: f7-dive
+        iconF7: expand
+        style:
+          margin-left: 10px
+          margin-top: 10px
+          opacity: 60%
+          position: absolute
+          z-index: 1
+        visible: "(=vars.varPeriod == 'day' | vars.varPeriod == undefined) ? true : false"
+    - component: oh-link
+      config:
+        action: navigate
+        actionItem: produzierterStrom
+        actionPageTransition: f7-dive
+        iconF7: expand
+        style:
+          margin-left: 10px
+          margin-top: 10px
+          opacity: 60%
+          position: absolute
+          z-index: 1
+        visible: "=vars.varPeriod == 'week'  ? true : false"
+    - component: oh-link
+      config:
+        action: navigate
+        actionItem: produzierterStrom
+        actionPageTransition: f7-dive
+        iconF7: expand
+        style:
+          margin-left: 10px
+          margin-top: 10px
+          opacity: 60%
+          position: absolute
+          z-index: 1
+        visible: "=vars.varPeriod == 'month'  ? true : false"
+    - component: oh-link
+      config:
+        action: navigate
+        actionItem: produzierterStrom
+        actionPageTransition: f7-dive
+        iconF7: expand
+        style:
+          margin-left: 10px
+          margin-top: 10px
+          opacity: 60%
+          position: absolute
+          z-index: 1
+        visible: "=vars.varPeriod == 'year'  ? true : false"
+    - component: f7-segmented
+      config:
+        class: segmented-round
+        style:
+          bottom: 0px
+          height: 30px
+          left: 0px
+          position: absolute
+          width: 100%
+          z-index: 2
+      slots:
+        default:
+          - component: oh-button
+            config:
+              action: variable
+              actionVariable: varPeriod
+              actionVariableValue: day
+              iconSize: 20px
+              style:
+                --f7-button-bg-color: "=(vars.varPeriod == 'day' || vars.varPeriod == undefined) ? 'transparent' :   '#f0f0f0'  "
+                --f7-button-hover-bg-color: "#e7f3fe"
+                --f7-button-pressed-bg-color: "#9dcefb"
+                height: 100%
+                width: 100%
+              text: Tag
+              textColor: "=(vars.varPeriod == 'day' || vars.varPeriod == undefined ) ? 'transparent' :   'black'  "
+          - component: oh-button
+            config:
+              action: variable
+              actionVariable: varPeriod
+              actionVariableValue: week
+              iconSize: 20px
+              style:
+                --f7-button-bg-color: "=(vars.varPeriod == 'week' ) ? 'transparent' :   '#f0f0f0'  "
+                --f7-button-hover-bg-color: "#e7f3fe"
+                --f7-button-pressed-bg-color: "#9dcefb"
+                height: 100%
+                width: 100%
+              text: Woche
+              textColor: "=(vars.varPeriod == 'week' ) ? 'transparent' :   'black'  "
+          - component: oh-button
+            config:
+              action: variable
+              actionVariable: varPeriod
+              actionVariableValue: month
+              iconSize: 20px
+              style:
+                --f7-button-bg-color: "=(vars.varPeriod == 'month')  ? 'transparent' :   '#f0f0f0'  "
+                --f7-button-hover-bg-color: "#e7f3fe"
+                --f7-button-pressed-bg-color: "#9dcefb"
+                height: 100%
+                width: 100%
+              text: Monat
+              textColor: "=(vars.varPeriod == 'month' ) ? 'transparent' :   'black'  "
+          - component: oh-button
+            config:
+              action: variable
+              actionVariable: varPeriod
+              actionVariableValue: year
+              iconSize: 20px
+              style:
+                --f7-button-bg-color: "=(vars.varPeriod == 'year') ? 'transparent' :   '#f0f0f0'  "
+                --f7-button-hover-bg-color: "#e7f3fe"
+                --f7-button-pressed-bg-color: "#9dcefb"
+                height: 100%
+                width: 100%
+              text: Jahr
+              textColor: "=(vars.varPeriod == 'year' ) ? 'transparent' :   'black'  "
+              visible: true
+    - component: oh-chart
+      config:
+        chartType: year
+        height: 100%
+        options:
+          backgroundColor: transparent
+        sidebar: true
+        visible: "=vars.varPeriod == 'year'  ? true : false"
+      slots:
+        calendar: []
+        grid:
+          - component: oh-chart-grid
+            config:
+              height: 70%
+              includeLabels: true
+              left: 70
+              right: 70
+              show: false
+              top: 80
+        legend:
+          - component: oh-chart-legend
+            config:
+              left: 70
+              orient: vertical
+              show: true
+              top: 10
+              width: 600
+        series:
+          - component: oh-aggregate-series
+            config:
+              aggregationFunction: sum
+              color: orange
+              dimension1: month
+              gridIndex: 0
+              id: 0
+              item: produzierterStrom
+              type: bar
+              xAxisIndex: 0
+              yAxisIndex: 0
+        tooltip:
+          - component: oh-chart-tooltip
+            config:
+              confine: true
+              show: true
+              trigger: axis
+        xAxis:
+          - component: oh-category-axis
+            config:
+              axisLabel:
+                color: black
+              categoryType: year
+              gridIndex: 0
+              monthFormat: short
+              nameLocation: center
+              weekdayFormat: short
+        yAxis:
+          - component: oh-value-axis
+            config:
+              axisLabel:
+                color: black
+                formatter: "{value} Wh  "
+              gridIndex: 0
+    - component: oh-chart
+      config:
+        chartType: isoWeek
+        height: 100%
+        options:
+          backgroundColor: transparent
+        sidebar: true
+        visible: "=vars.varPeriod == 'week' ? true : false"
+      slots:
+        grid:
+          - component: oh-chart-grid
+            config:
+              height: 70%
+              includeLabels: true
+              left: 70
+              right: 70
+              show: false
+              top: 80
+        legend:
+          - component: oh-chart-legend
+            config:
+              left: 70
+              orient: vertical
+              show: true
+              top: 10
+              width: 600
+        series:
+          - component: oh-aggregate-series
+            config:
+              aggregationFunction: sum
+              color: orange
+              dimension1: isoWeekday
+              gridIndex: 0
+              id: 0
+              item: produzierterStrom
+              type: bar
+              xAxisIndex: 0
+              yAxisIndex: 0
+        tooltip:
+          - component: oh-chart-tooltip
+            config:
+              confine: true
+              show: true
+              trigger: axis
+        xAxis:
+          - component: oh-category-axis
+            config:
+              axisLabel:
+                color: black
+              categoryType: week
+              gridIndex: 0
+              monthFormat: short
+              weekdayFormat: short
+        yAxis:
+          - component: oh-value-axis
+            config:
+              axisLabel:
+                color: black
+                formatter: "{value} Wh"
+              gridIndex: 0
+    - component: oh-chart
+      config:
+        chartType: month
+        height: 100%
+        options:
+          backgroundColor: transparent
+        sidebar: true
+        visible: "=vars.varPeriod == 'month' ? true : false"
+      slots:
+        calendar: []
+        grid:
+          - component: oh-chart-grid
+            config:
+              height: 70%
+              includeLabels: true
+              left: 70
+              right: 70
+              show: false
+              top: 80
+        legend:
+          - component: oh-chart-legend
+            config:
+              left: 70
+              orient: vertical
+              show: true
+              top: 10
+              width: 600
+        series:
+          - component: oh-aggregate-series
+            config:
+              aggregationFunction: sum
+              color: orange
+              dimension1: date
+              gridIndex: 0
+              id: 0
+              item: produzierterStrom
+              type: bar
+              xAxisIndex: 0
+              yAxisIndex: 0
+        tooltip:
+          - component: oh-chart-tooltip
+            config:
+              confine: true
+              show: true
+              trigger: axis
+        visualMap:
+          - component: oh-chart-visualmap
+            config:
+              calculable: true
+              min: "1"
+              orient: vertical
+              seriesIndex: 0
+              show: false
+              type: continuous
+        xAxis:
+          - component: oh-category-axis
+            config:
+              Style:
+                color: black
+              axisLabel:
+                color: black
+              categoryType: month
+              gridIndex: 0
+              monthFormat: short
+              name: Tag
+              nameGap: 30
+              nameLocation: center
+              weekdayFormat: short
+        yAxis:
+          - component: oh-value-axis
+            config:
+              axisLabel:
+                color: black
+                formatter: "{value} Wh"
+              gridIndex: 0
+    - component: oh-chart
+      config:
+        chartType: day
+        height: 100%
+        options:
+          backgroundColor: transparent
+        sidebar: true
+        visible: "=vars.varPeriod == 'day' || vars.varPeriod == undefined ? true : false"
+      slots:
+        calendar: []
+        grid:
+          - component: oh-chart-grid
+            config:
+              height: 70%
+              includeLabels: true
+              left: 70
+              right: 70
+              show: false
+              top: 80
+        legend:
+          - component: oh-chart-legend
+            config:
+              left: 70
+              orient: vertical
+              show: true
+              top: 10
+              width: 600
+        series:
+          - component: oh-aggregate-series
+            config:
+              color: orange
+              dimension1: hour
+              gridIndex: 0
+              id: 1
+              item: produzierterStrom
+              type: bar
+              xAxisIndex: 0
+              yAxisIndex: 0
+        tooltip:
+          - component: oh-chart-tooltip
+            config:
+              confine: true
+              show: true
+        xAxis:
+          - component: oh-category-axis
+            config:
+              axisLabel:
+                color: black
+              categoryType: day
+              gridIndex: 0
+              monthFormat: short
+              style:
+                color: black
+              weekdayFormat: short
+        yAxis:
+          - component: oh-value-axis
+            config:
+              axisLabel:
+                color: black
+                formatter: "{value} Wh"
+              gridIndex: 0
